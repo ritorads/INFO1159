@@ -124,6 +124,7 @@ def plot_cuadricula(poblacion):
         ax.set_ylabel('Fila')
         plt.pause(0.1)
 
+        
     for fila in range(tamano_tablero):
         for columna in range(tamano_tablero):
             individuo_id = cuadricula[fila][columna]
