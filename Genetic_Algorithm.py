@@ -1,400 +1,117 @@
 import random
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 
-def fitness(cromosoma):
-    # Funcion de fitness
-    return 0
+class Individual:
+    def __init__(self, x, y, probabilities):
+        self.x = x
+        self.y = y
+        self.probabilities = probabilities
+
+    def move(self):
+        direction = random.choices(
+            [
+                "north",
+                "south",
+                "east",
+                "west",
+                "northeast",
+                "northwest",
+                "southeast",
+                "southwest",
+                "stay",
+            ],
+            weights=self.probabilities,
+        )[0]
+
+        if direction == "north":
+            self.y = min(self.y + 1, 19)
+        elif direction == "south":
+            self.y = max(self.y - 1, 0)
+        elif direction == "east":
+            self.x = min(self.x + 1, 19)
+        elif direction == "west":
+            self.x = max(self.x - 1, 0)
+        elif direction == "northeast":
+            self.x = min(self.x + 1, 19)
+            self.y = min(self.y + 1, 19)
+        elif direction == "northwest":
+            self.x = max(self.x - 1, 0)
+            self.y = min(self.y + 1, 19)
+        elif direction == "southeast":
+            self.x = min(self.x + 1, 19)
+            self.y = max(self.y - 1, 0)
+        elif direction == "southwest":
+            self.x = max(self.x - 1, 0)
+            self.y = max(self.y - 1, 0)
 
 
-def normalizar_vector(vector):
-    suma = sum(vector)
-    vector_normalizado = [valor / suma for valor in vector]
-    return vector_normalizado
+class GeneticAlgorithm:
+    def __init__(self, population_size, grid_size, movement_limit, goal_x):
+        self.population_size = population_size
+        self.grid_size = grid_size
+        self.movement_limit = movement_limit
+        self.goal_x = goal_x
+        self.population = []
+        self.generation = 0
+
+    def initialize_population(self):
+        self.population = []
+        for _ in range(self.population_size):
+            x = 0
+            y = random.randint(0, self.grid_size - 1)
+            probabilities = self.generate_normalized_probabilities()
+            individual = Individual(x, y, probabilities)
+            self.population.append(individual)
+
+    def generate_normalized_probabilities(self):
+        probabilities = [random.random() for _ in range(9)]
+        normalization_factor = sum(probabilities)
+        probabilities = [p / normalization_factor for p in probabilities]
+        return probabilities
+
+    def simulate_generation(self):
+        new_population = []
+        for individual in self.population:
+            for _ in range(self.movement_limit):
+                individual.move()
+
+                if individual.x >= self.goal_x:
+                    break
+
+            new_population.append(individual)
+
+        self.population = new_population
+        self.generation += 1
+
+    def update_plot(self, frame):
+        plt.cla()
+        plt.xlim(0, self.grid_size - 1)
+        plt.ylim(0, self.grid_size - 1)
+        plt.title(f"Generation {self.generation}")
+
+        for individual in self.population:
+            plt.scatter(individual.x, individual.y, color="b")
+
+        self.simulate_generation()
+
+    def run(self):
+        self.initialize_population()
+
+        fig = plt.figure()
+        ani = animation.FuncAnimation(fig, self.update_plot, interval=1000, blit=False)
+        plt.show()
 
 
-def creacion_cromosomas_perfectos(num_genes, contador_movimientos):
-    probabilidades = []  # Vector de probabilidades
-    for _ in range(num_genes):
-        probabilidades.append(0)
-    probabilidades[2] = 1
-    # Genera las probabilidades aleatorias
-    # Normaliza el vector de probabilidades
-    probabilidades = normalizar_vector(probabilidades)
+# Parámetros del algoritmo
+population_size = 20
+grid_size = 20
+movement_limit = 10
+goal_x = grid_size - 1
 
-    # Crea el cromosoma con probabilidades aleatorias y contador de movimientos
-    cromosoma = {"genes": probabilidades, "contador_movimientos": contador_movimientos}
+# Crear instancia del algoritmo genético
+genetic_algorithm = GeneticAlgorithm(population_size, grid_size, movement_limit, goal_x)
 
-    return cromosoma
-
-
-def creacion_cromosomas(num_genes, contador_movimientos):
-    # Genera las probabilidades aleatorias
-    probabilidades = [random.random() for _ in range(num_genes)]
-
-    # Normaliza el vector de probabilidades
-    probabilidades = normalizar_vector(probabilidades)
-
-    # Crea el cromosoma con probabilidades aleatorias y contador de movimientos
-    cromosoma = {"genes": probabilidades, "contador_movimientos": contador_movimientos}
-
-    return cromosoma
-
-
-def crear_poblacion(num_individuos, contador_movimientos):
-    poblacion = []
-
-    for _ in range(num_individuos):
-        cromosoma = creacion_cromosomas(9, contador_movimientos)
-        poblacion.append(cromosoma)
-
-    return poblacion
-
-
-def seleccion_cromosomas():  # % de probabilidad de que sea seleccionado por fitness
-    def probabilidad_acumulada():  # definir p de cada cromosoma
-        return 0
-
-    def ultimo_cromosoma_menor_round():
-        return 0
-
-    def sacar_padres():  # obtenemos los que tengan mejor fitness
-        return 0
-
-    return 0
-
-
-def cruzar_cromosomas():
-    return 0
-
-
-def mutar_cromosomas():
-    return 0
-
-
-def llena_poblacion():
-    return 0
-
-
-def plot_cuadricula_ESPARTANA(poblacion, titulo):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_title(titulo)
-
-    # Crear una matriz de cuadrícula vacía
-    cuadricula = [[0] * 20 for _ in range(20)]
-
-    # Posicionar los individuos en la primera columna de la cuadrícula sin superponerse
-    for i, individuo in enumerate(poblacion):
-        fila = i
-        cuadricula[fila][0] = i + 1
-
-    # Generar un color aleatorio para los individuos
-    colores = ["#0000FF"] * len(poblacion)
-
-    # Iterar por cada paso
-    pasos_maximos = poblacion[0]["contador_movimientos"]
-    for paso in range(pasos_maximos):
-        # Limpiar la cuadrícula actual
-        cuadricula_actual = [[0] * 20 for _ in range(20)]
-
-        # Mover los individuos y cambiar el color según las reglas establecidas
-        for fila in range(20):
-            for columna in range(20):
-                individuo_id = cuadricula[fila][columna]
-                if individuo_id != 0:
-                    individuo = poblacion[individuo_id - 1]
-                    if columna < 19:
-                        if cuadricula[fila][columna + 1] == 0:
-                            # Mover el individuo según las probabilidades de movimiento
-                            movimientos = [
-                                "norte",
-                                "sur",
-                                "este",
-                                "oeste",
-                                "diag_ne",
-                                "diag_no",
-                                "diag_se",
-                                "diag_so",
-                                "no_moverse",
-                            ]
-                            pesos = individuo["genes"][
-                                :9
-                            ]  # Tomar los primeros 9 valores del vector de genes
-                            movimiento = random.choices(
-                                movimientos, weights=pesos, k=1
-                            )[0]
-                            nueva_fila = fila
-                            nueva_columna = columna
-                            if movimiento == "norte":
-                                nueva_fila -= 1
-                            elif movimiento == "sur":
-                                nueva_fila += 1
-                            elif movimiento == "este":
-                                nueva_columna += 1
-                            elif movimiento == "oeste":
-                                nueva_columna -= 1
-                            elif movimiento == "diag_ne":
-                                nueva_fila -= 1
-                                nueva_columna += 1
-                            elif movimiento == "diag_no":
-                                nueva_fila -= 1
-                                nueva_columna -= 1
-                            elif movimiento == "diag_se":
-                                nueva_fila += 1
-                                nueva_columna += 1
-                            elif movimiento == "diag_so":
-                                nueva_fila += 1
-                                nueva_columna -= 1
-
-                            # Evitar salir de los límites de la cuadrícula
-                            if (
-                                nueva_fila >= 0
-                                and nueva_fila <= 19
-                                and nueva_columna >= 0
-                                and nueva_columna <= 19
-                            ):
-                                if cuadricula_actual[nueva_fila][nueva_columna] == 0:
-                                    cuadricula_actual[nueva_fila][
-                                        nueva_columna
-                                    ] = individuo_id
-                                else:
-                                    # La casilla está ocupada, mantener al individuo en su posición actual
-                                    cuadricula_actual[fila][columna] = individuo_id
-                            else:
-                                # El individuo ha llegado al final de la cuadrícula
-                                cuadricula_actual[fila][columna] = individuo_id
-                        elif columna == 19:
-                            # El individuo ha llegado a la última columna y se queda en su posición
-                            cuadricula_actual[fila][columna] = individuo_id
-                    else:
-                        # El individuo ha llegado al final de la cuadrícula
-                        cuadricula_actual[fila][columna] = individuo_id
-
-        # Actualizar la cuadrícula
-        cuadricula = cuadricula_actual
-
-        # Actualizar el gráfico
-        ax.clear()
-        ax.imshow(cuadricula, cmap="Blues", vmin=0, vmax=len(poblacion))
-        for fila in range(20):
-            for columna in range(20):
-                individuo_id = cuadricula[fila][columna]
-                if individuo_id != 0:
-                    ax.text(
-                        columna,
-                        fila,
-                        individuo_id,
-                        color=colores[individuo_id - 1],
-                        ha="center",
-                        va="center",
-                    )
-        ax.grid(True, color="black", linewidth=0.5)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_xlabel("Columna")
-        ax.set_ylabel("Fila")
-        plt.pause(0.1)  # Pausa para actualizar la gráfica
-
-    # Cambiar el color de los individuos que han llegado al final a verde
-    for fila in range(20):
-        for columna in range(20):
-            individuo_id = cuadricula[fila][columna]
-            if individuo_id != 0:
-                colores[individuo_id - 1] = "#00FF00"  # Cambiar el color a verde
-
-    # Actualizar el gráfico final sin cerrarlo
-    ax.clear()
-    ax.imshow(cuadricula, cmap="Blues", vmin=0, vmax=len(poblacion))
-    for fila in range(20):
-        for columna in range(20):
-            individuo_id = cuadricula[fila][columna]
-            if individuo_id != 0:
-                ax.text(
-                    columna,
-                    fila,
-                    individuo_id,
-                    color=colores[individuo_id - 1],
-                    ha="center",
-                    va="center",
-                )
-    ax.grid(True, color="black", linewidth=0.5)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_xlabel("Columna")
-    ax.set_ylabel("Fila")
-    plt.show()
-
-
-def plot_cuadricula(poblacion, titulo, pasos_maximos_poblacion):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_title(titulo)
-
-    # Crear una matriz de cuadrícula vacía
-    cuadricula = [[0] * 20 for _ in range(20)]
-
-    # Posicionar los individuos en la primera columna de la cuadrícula sin superponerse
-    for i, individuo in enumerate(poblacion):
-        fila = i
-        cuadricula[fila][0] = i + 1
-
-    # Generar un color aleatorio para los individuos
-    colores = ["#0330FF"] * len(poblacion)
-
-    # Iterar por cada paso
-    pasos_maximos = pasos_maximos_poblacion
-    for paso in range(pasos_maximos):
-        # Limpiar la cuadrícula actual
-        cuadricula_actual = [[0] * 20 for _ in range(20)]
-
-        # Mover los individuos y cambiar el color según las reglas establecidas
-        for fila in range(20):
-            for columna in range(20):
-                individuo_id = cuadricula[fila][columna]
-                if individuo_id != 0:
-                    individuo = poblacion[individuo_id - 1]
-                    if columna < 19:
-                        if cuadricula[fila][columna + 1] == 0:
-                            # Mover el individuo según las probabilidades de movimiento
-                            movimientos = [
-                                "norte",
-                                "sur",
-                                "este",
-                                "oeste",
-                                "diag_ne",
-                                "diag_no",
-                                "diag_se",
-                                "diag_so",
-                                "no_moverse",
-                            ]
-                            pesos = individuo["genes"][
-                                :9
-                            ]  # Tomar los primeros 9 valores del vector de genes
-                            movimiento = random.choices(
-                                movimientos, weights=pesos, k=1
-                            )[0]
-                            nueva_fila = fila
-                            nueva_columna = columna
-                            if movimiento == "norte":
-                                nueva_fila -= 1
-                            elif movimiento == "sur":
-                                nueva_fila += 1
-                            elif movimiento == "este":
-                                nueva_columna += 1
-                            elif movimiento == "oeste":
-                                nueva_columna -= 1
-                            elif movimiento == "diag_ne":
-                                nueva_fila -= 1
-                                nueva_columna += 1
-                            elif movimiento == "diag_no":
-                                nueva_fila -= 1
-                                nueva_columna -= 1
-                            elif movimiento == "diag_se":
-                                nueva_fila += 1
-                                nueva_columna += 1
-                            elif movimiento == "diag_so":
-                                nueva_fila += 1
-                                nueva_columna -= 1
-
-                            # Evitar salir de los límites de la cuadrícula
-                            if (
-                                nueva_fila >= 0
-                                and nueva_fila <= 19
-                                and nueva_columna >= 0
-                                and nueva_columna <= 19
-                            ):
-                                if cuadricula_actual[nueva_fila][nueva_columna] == 0:
-                                    cuadricula_actual[nueva_fila][
-                                        nueva_columna
-                                    ] = individuo_id
-                                else:
-                                    # La casilla está ocupada, mantener al individuo en su posición actual
-                                    cuadricula_actual[fila][columna] = individuo_id
-                                    print(
-                                        "Individuo {} se ha quedado en su posición actual".format(
-                                            individuo_id
-                                        )
-                                    )
-                            else:
-                                # El individuo ha llegado al final de la cuadrícula
-                                cuadricula_actual[fila][columna] = individuo_id
-                        else:
-                            # El individuo ha llegado a la última columna y se queda en su posición
-                            cuadricula_actual[fila][columna] = individuo_id
-                    else:
-                        # El individuo ha llegado al final de la cuadrícula
-                        cuadricula_actual[fila][columna] = individuo_id
-                        print(
-                            "Individuo {} ha llegado a la última columna".format(
-                                individuo_id
-                            )
-                        )
-
-        # Actualizar la cuadrícula
-        cuadricula = cuadricula_actual
-
-        # Actualizar el gráfico
-        ax.clear()
-        ax.imshow(cuadricula, cmap="Blues", vmin=0, vmax=len(poblacion))
-        for fila in range(20):
-            for columna in range(20):
-                individuo_id = cuadricula[fila][columna]
-                if individuo_id != 0:
-                    ax.text(
-                        columna,
-                        fila,
-                        individuo_id,
-                        color=colores[individuo_id - 1],
-                        ha="center",
-                        va="center",
-                    )
-        ax.grid(True, color="black", linewidth=0.5)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_xlabel("Columna")
-        ax.set_ylabel("Fila")
-        plt.pause(0.1)  # Pausa para actualizar la gráfica
-
-    # Cambiar el color de los individuos que han llegado al final a verde
-    for fila in range(20):
-        for columna in range(20):
-            individuo_id = cuadricula[fila][columna]
-            if individuo_id != 0:
-                colores[individuo_id - 1] = "#00FF00"  # Cambiar el color a verde
-
-    # Actualizar el gráfico final sin cerrarlo
-    ax.clear()
-    ax.imshow(cuadricula, cmap="Blues", vmin=0, vmax=len(poblacion))
-    for fila in range(20):
-        for columna in range(20):
-            individuo_id = cuadricula[fila][columna]
-            if individuo_id != 0:
-                ax.text(
-                    columna,
-                    fila,
-                    individuo_id,
-                    color=colores[individuo_id - 1],
-                    ha="center",
-                    va="center",
-                )
-    ax.grid(True, color="black", linewidth=0.5)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_xlabel("Columna")
-    ax.set_ylabel("Fila")
-    plt.show()
-
-
-def main():
-    # Inicializar poblacion
-    poblacion = crear_poblacion(20, 100)
-    print(poblacion)
-    grafico = plot_cuadricula(poblacion, "Población inicial", 100)
-
-    # grafico2 = plot_cuadricula_ESPARTANA(poblacion, 'Población final')
-    return 0
-
-
-if __name__ == "__main__":
-    main()
+# Ejecutar el algoritmo
+genetic_algorithm.run()
