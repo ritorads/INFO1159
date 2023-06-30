@@ -202,15 +202,21 @@ def plot_cuadricula(poblacion, iteraciones, max_it):
     ax.set_ylabel("Fila")
     print("Fin del algoritmo genético")
 
-    seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
+    Seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
     plt.show()
+
+    return Seleccion
 
 
 def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
+    plt.draw()
+    plt.pause(0.1)
+    plt.close()
+
     gen_prueba = [
         {"contador_movimientos": pasos_maximos + 1, "posicion_actual": (0, 0), "id": 0}
     ]
-    Mejores_individuos = [gen_prueba[0], gen_prueba[0], gen_prueba[0]]
+    Mejores_individuos = [gen_prueba[0], gen_prueba[0]]
 
     print("INDIVIDUOS QUE LLEGARON AL FINAL")
     print("================================")
@@ -221,7 +227,6 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
                 individuo["contador_movimientos"]
                 < Mejores_individuos[0]["contador_movimientos"]
             ):
-                Mejores_individuos[2] = Mejores_individuos[1]
                 Mejores_individuos[1] = Mejores_individuos[0]
                 Mejores_individuos[0] = individuo
 
@@ -229,14 +234,7 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
                 individuo["contador_movimientos"]
                 < Mejores_individuos[1]["contador_movimientos"]
             ):
-                Mejores_individuos[2] = Mejores_individuos[1]
                 Mejores_individuos[1] = individuo
-
-            elif (
-                individuo["contador_movimientos"]
-                < Mejores_individuos[2]["contador_movimientos"]
-            ):
-                Mejores_individuos[2] = individuo
 
     print("================================")
     for i, individuo in enumerate(poblacion):
@@ -244,18 +242,20 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     print("================================")
 
-    if Mejores_individuos[0]["contador_movimientos"] == pasos_maximos + 1:
-        print("Ningún individuo llegó al final")
+    if Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1:
+        return "Ningún individuo llegó al final"
 
-    else:
+    elif Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1:
         print(
-            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']} \n 3er lugar : {Mejores_individuos[2]['id']}, posicion{Mejores_individuos[2]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[2]['contador_movimientos']}"
+            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
         )
+        return Mejores_individuos
 
 
 # Crear población inicial de 5 individuos con 30 movimientos
-pobla = crear_poblacion(20, 50)
+pobla = crear_poblacion(20, 60)
 
 
 # Ejecutar algoritmo genético
-plot_cuadricula(pobla, 20, 0)
+Resultado = plot_cuadricula(pobla, 20, 0)
+print(Resultado)
