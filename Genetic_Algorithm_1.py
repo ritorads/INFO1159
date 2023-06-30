@@ -38,7 +38,7 @@ def creacion_cromosomas(num_genes, contador_movimientos):
     return cromosoma
 
 
-def plot_cuadricula(poblacion, iteraciones, max_it):
+def plot_cuadricula(poblacion):
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
 
@@ -204,15 +204,10 @@ def plot_cuadricula(poblacion, iteraciones, max_it):
 
     Seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
     plt.show()
-
     return Seleccion
 
 
 def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
-    plt.draw()
-    plt.pause(0.1)
-    plt.close()
-
     gen_prueba = [
         {"contador_movimientos": pasos_maximos + 1, "posicion_actual": (0, 0), "id": 0}
     ]
@@ -238,7 +233,7 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     print("================================")
     for i, individuo in enumerate(poblacion):
-        print(f"individuo {i}, posicion {individuo['posicion_actual']}")
+        print(f"individuo {i+1}, posicion {individuo['posicion_actual']}")
 
     print("================================")
 
@@ -247,7 +242,8 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     elif Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1:
         print(
-            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
+            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \
+            \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
         )
         return Mejores_individuos
 
@@ -257,5 +253,8 @@ pobla = crear_poblacion(20, 60)
 
 
 # Ejecutar algoritmo genético
-Resultado = plot_cuadricula(pobla, 20, 0)
+Resultado = plot_cuadricula(pobla)
 print(Resultado)
+
+# if Resultado != "Ningún individuo llegó al final":
+# Mutar_
