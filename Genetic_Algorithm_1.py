@@ -38,7 +38,7 @@ def creacion_cromosomas(num_genes, contador_movimientos):
     return cromosoma
 
 
-def plot_cuadricula(poblacion, iteraciones, max_it):
+def plot_cuadricula(poblacion, num_generaciones):
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
 
@@ -171,9 +171,10 @@ def plot_cuadricula(poblacion, iteraciones, max_it):
         ax.grid(True, color="black", linewidth=0.5)
         ax.set_xticks([])
         ax.set_yticks([])
-        ax.set_xlabel("Columna")
-        ax.set_ylabel("Fila")
-        plt.pause(0.001)
+        ax.set_title("GENERACION {}, PASO {}".format(num_generaciones, paso + 1))
+        ax.set_xlabel("DIRECION HACIA LA META -->")
+        ax.set_ylabel("INICIO DE INDIVIDUOS")
+        plt.pause(0.000000001)
 
     for fila in range(tamano_tablero):
         for columna in range(tamano_tablero):
@@ -203,7 +204,9 @@ def plot_cuadricula(poblacion, iteraciones, max_it):
     print("Fin del algoritmo genético")
 
     Seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
-    plt.show()
+    plt.draw()
+    plt.pause(0.1)
+    plt.close()  # Cerrar automáticamente la ventana de la gráfica
 
     return Seleccion
 
@@ -252,10 +255,25 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         return Mejores_individuos
 
 
-# Crear población inicial de 5 individuos con 30 movimientos
-pobla = crear_poblacion(20, 60)
+def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantidad_Pasos): ## def Obtener2padres():
+ Generacion_Actual = 0
+ while(Generacion_Actual<Cantidad_generaciones):    
+    while True:
+        poblacion = crear_poblacion(Cantidad_Individuos,Cantidad_Pasos)  # Ejemplo con 10 individuos y 10 movimientos
+        resultado = plot_cuadricula(poblacion,Generacion_Actual)
+        Generacion_Actual+=1
+        if resultado !="Ningún individuo llegó al final":
+            break
+    print("RESULTADO DE LA SELECCIÓN DE PADRES")
+    print("==================================")
+    print(resultado)
+    print("==================================")
+    #nueva_poblacion = reproduccion(resultado) # resultados lleva los 2 mejores individuos
+     ### TODO LO DEMAS ####
+     
+    Generacion_Actual+=1
+    return 0
 
 
-# Ejecutar algoritmo genético
-Resultado = plot_cuadricula(pobla, 20, 0)
-print(Resultado)
+
+PRUEBA = funcionamiento_principal(40,20,45)
