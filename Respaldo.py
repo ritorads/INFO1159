@@ -272,4 +272,4 @@ def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantida
 
 
 
-PRUEBA = funcionamiento_principal(40,20,35)
+PRUEBA = funcionamiento_principal(40,20,70)
