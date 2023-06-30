@@ -38,7 +38,11 @@ def creacion_cromosomas(num_genes, contador_movimientos):
     return cromosoma
 
 
+<<<<<<< HEAD
+def plot_cuadricula(poblacion):
+=======
 def plot_cuadricula(poblacion, num_generaciones):
+>>>>>>> cfb561b54720ce0afd4cbfeced99e3fc4abf54f9
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
 
@@ -204,10 +208,14 @@ def plot_cuadricula(poblacion, num_generaciones):
     print("Fin del algoritmo genético")
 
     Seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
+<<<<<<< HEAD
+    plt.show()
+=======
     plt.draw()
-    plt.pause(0.001)
+    plt.pause(0.1)
     plt.close()  # Cerrar automáticamente la ventana de la gráfica
 
+>>>>>>> cfb561b54720ce0afd4cbfeced99e3fc4abf54f9
     return Seleccion
 
 
@@ -237,7 +245,7 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     print("================================")
     for i, individuo in enumerate(poblacion):
-        print(f"individuo {i}, posicion {individuo['posicion_actual']}")
+        print(f"individuo {i+1}, posicion {individuo['posicion_actual']}")
 
     print("================================")
 
@@ -246,11 +254,12 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     elif Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1:
         print(
-            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
+            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \
+            \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
         )
         return Mejores_individuos
 
-##############################################################################################################
+
 def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantidad_Pasos): ## def Obtener2padres():
  Generacion_Actual = 0
  while(Generacion_Actual<Cantidad_generaciones):    
@@ -258,7 +267,7 @@ def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantida
         poblacion = crear_poblacion(Cantidad_Individuos,Cantidad_Pasos)  # Ejemplo con 10 individuos y 10 movimientos
         resultado = plot_cuadricula(poblacion,Generacion_Actual)
         Generacion_Actual+=1
-        if resultado !="Ningún individuo llegó al final" or Generacion_Actual==Cantidad_generaciones:
+        if resultado !="Ningún individuo llegó al final":
             break
     print("RESULTADO DE LA SELECCIÓN DE PADRES")
     print("==================================")
@@ -271,5 +280,14 @@ def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantida
     return 0
 
 
+<<<<<<< HEAD
+# Ejecutar algoritmo genético
+Resultado = plot_cuadricula(pobla)
+print(Resultado)
 
-PRUEBA = funcionamiento_principal(40,20,70)
+# if Resultado != "Ningún individuo llegó al final":
+# Mutar_
+=======
+
+PRUEBA = funcionamiento_principal(40,20,45)
+>>>>>>> cfb561b54720ce0afd4cbfeced99e3fc4abf54f9
