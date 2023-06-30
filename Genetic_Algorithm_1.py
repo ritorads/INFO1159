@@ -202,6 +202,11 @@ def plot_cuadricula(poblacion, iteraciones, max_it):
     ax.set_ylabel("Fila")
     print("Fin del algoritmo genético")
 
+    seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
+    plt.show()
+
+
+def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     gen_prueba = [
         {"contador_movimientos": pasos_maximos + 1, "posicion_actual": (0, 0), "id": 0}
     ]
@@ -236,18 +241,16 @@ def plot_cuadricula(poblacion, iteraciones, max_it):
     print("================================")
     for i, individuo in enumerate(poblacion):
         print(f"individuo {i}, posicion {individuo['posicion_actual']}")
+
     print("================================")
 
     if Mejores_individuos[0]["contador_movimientos"] == pasos_maximos + 1:
         print("Ningún individuo llegó al final")
+
     else:
         print(
             f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']} \n 3er lugar : {Mejores_individuos[2]['id']}, posicion{Mejores_individuos[2]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[2]['contador_movimientos']}"
         )
-    plt.show()
-
-    if max_it < iteraciones:
-        plot_cuadricula(pobla, iteraciones, max_it + 1)
 
 
 # Crear población inicial de 5 individuos con 30 movimientos
