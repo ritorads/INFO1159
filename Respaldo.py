@@ -174,7 +174,7 @@ def plot_cuadricula(poblacion, num_generaciones):
         ax.set_title("GENERACION {}, PASO {}".format(num_generaciones, paso + 1))
         ax.set_xlabel("DIRECION HACIA LA META -->")
         ax.set_ylabel("INICIO DE INDIVIDUOS")
-        plt.pause(0.000000001)
+        plt.pause(0.001)
 
     for fila in range(tamano_tablero):
         for columna in range(tamano_tablero):
@@ -204,8 +204,7 @@ def plot_cuadricula(poblacion, num_generaciones):
     print("Fin del algoritmo genético")
 
     Seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
-    plt.draw()
-    plt.pause(0.001)
+
     plt.close()  # Cerrar automáticamente la ventana de la gráfica
 
     return Seleccion
@@ -250,26 +249,35 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         )
         return Mejores_individuos
 
+
 ##############################################################################################################
-def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantidad_Pasos): ## def Obtener2padres():
- Generacion_Actual = 0
- while(Generacion_Actual<Cantidad_generaciones):    
-    while True:
-        poblacion = crear_poblacion(Cantidad_Individuos,Cantidad_Pasos)  # Ejemplo con 10 individuos y 10 movimientos
-        resultado = plot_cuadricula(poblacion,Generacion_Actual)
-        Generacion_Actual+=1
-        if resultado !="Ningún individuo llegó al final" or Generacion_Actual==Cantidad_generaciones:
-            break
-    print("RESULTADO DE LA SELECCIÓN DE PADRES")
-    print("==================================")
-    print(resultado)
-    print("==================================")
-    #nueva_poblacion = reproduccion(resultado) # resultados lleva los 2 mejores individuos
-     ### TODO LO DEMAS ####
-     
-    Generacion_Actual+=1
-    return 0
+def funcionamiento_principal(
+    Cantidad_generaciones, Cantidad_Individuos, Cantidad_Pasos
+):  ## def Obtener2padres():
+    Generacion_Actual = 0
+    while Generacion_Actual < Cantidad_generaciones:
+        while True:
+            poblacion = crear_poblacion(
+                Cantidad_Individuos, Cantidad_Pasos
+            )  # Ejemplo con 10 individuos y 10 movimientos
+            resultado = plot_cuadricula(poblacion, Generacion_Actual)
+            Generacion_Actual += 1
+            if (
+                resultado != "Ningún individuo llegó al final"
+                or Generacion_Actual == Cantidad_generaciones
+            ):
+                break
+        print("RESULTADO DE LA SELECCIÓN DE PADRES")
+        print("==================================")
+        print(resultado)
+        print("==================================")
+        # nueva_poblacion = reproduccion(resultado) # resultados lleva los 2 mejores individuos
+        ### TODO LO DEMAS ####
+
+        Generacion_Actual += 1
+        return 0
 
 
-
-PRUEBA = funcionamiento_principal(40,20,70)
+PRUEBA = funcionamiento_principal(
+    40, 20, 40
+)  # Cantidad de generaciones, cantidad de individuos, cantidad de pasos
