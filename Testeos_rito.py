@@ -174,6 +174,12 @@ def plot_cuadricula(poblacion, num_generaciones):
     return seleccion
 
 
+##############################################################################################################
+##############################################################################################################
+##############################################################################################################
+# no tocar, trabajando aquí
+
+
 def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     gen_prueba = [
         {"contador_movimientos": pasos_maximos + 1, "posicion_actual": (0, 0), "id": 0}
@@ -207,7 +213,10 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     if Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1:
         return "Ningún individuo llegó al final"
 
-    elif Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1:
+    elif (
+        Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1
+        and Mejores_individuos[0]["contador_movimientos"] != pasos_maximos + 1
+    ):
         print(
             f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \
                 \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
@@ -215,7 +224,6 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         return Mejores_individuos
 
 
-##############################################################################################################
 def funcionamiento_principal(
     Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
 ):  ## def Obtener2padres():
@@ -270,6 +278,7 @@ def cruzar_cromosomas(Mejores_individuos):
 
     # Crear la nueva población
     nueva_poblacion = []
+
     for i in range(19):
         punto_cruce = random.randint(0, len(cromosoma_1) - 1)
         gen_hijo = cromosoma_1[:punto_cruce] + cromosoma_2[punto_cruce:]
@@ -303,6 +312,12 @@ def mutar_cromosomas(cromosoma):
     cromosoma[gen_a_mutar] = nuevo_valor
 
     return cromosoma
+
+
+##############################################################################################################
+##############################################################################################################
+##############################################################################################################
+##############################################################################################################
 
 
 # funcionamiento_principal(40,20,70) # 40 generaciones, 20 individuos, 70 pasos
