@@ -148,9 +148,7 @@ def plot_cuadricula(poblacion):
         plt.draw()
         plt.pause(0.1)
 
-    plt.ioff()
-
-    plt.show()
+    plt.close()
 
     for individuo in poblacion:
         individuo['posicion_actual'] = individuo['posiciones'][-1]
@@ -201,12 +199,12 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         return Mejores_individuos
 
 ##############################################################################################################
-def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantidad_Pasos): ## def Obtener2padres():
+def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos,cantidad_movimientos): ## def Obtener2padres():
  Generacion_Actual = 0
  while(Generacion_Actual<Cantidad_generaciones):    
     while True:
-        poblacion = crear_poblacion(Cantidad_Individuos,Cantidad_Pasos)  # Ejemplo con 10 individuos y 10 movimientos
-        resultado = plot_cuadricula(poblacion,Generacion_Actual)
+        poblacion = crear_poblacion(Cantidad_Individuos,cantidad_movimientos)  # Ejemplo con 10 individuos y 10 movimientos
+        resultado = plot_cuadricula(poblacion)
         Generacion_Actual+=1
         if resultado !="Ningún individuo llegó al final" or Generacion_Actual==Cantidad_generaciones:
             break
@@ -221,9 +219,7 @@ def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, Cantida
     return 0
 
 
-individuos = crear_poblacion(20,100)
+#funcionamiento_principal(40,20,70) # 40 generaciones, 20 individuos, 70 pasos
+asd = funcionamiento_principal(40,20,25)
 
-xd = plot_cuadricula(individuos)
-
-print(xd)
 #PRUEBA = funcionamiento_principal(40,20,70)
