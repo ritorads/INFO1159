@@ -183,6 +183,7 @@ def plot_cuadricula(poblacion, num_generaciones):
                 colores[individuo_id - 1] = "#00FF00"
 
     ax.clear()
+
     ax.imshow(cuadricula, cmap="Blues", vmin=0, vmax=num_individuos)
     for fila in range(tamano_tablero):
         for columna in range(tamano_tablero):
@@ -272,12 +273,18 @@ def funcionamiento_principal(
         print(resultado)
         print("==================================")
         # nueva_poblacion = reproduccion(resultado) # resultados lleva los 2 mejores individuos
+        cruzar_cromosomas(resultado)
+        # poblacion = nueva_poblacion
         ### TODO LO DEMAS ####
 
         Generacion_Actual += 1
         return 0
 
 
+def cruzar_cromosomas(Mejores_individuos):
+    return 0
+
+
 PRUEBA = funcionamiento_principal(
-    40, 20, 40
+    40, 20, 100
 )  # Cantidad de generaciones, cantidad de individuos, cantidad de pasos
