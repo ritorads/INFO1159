@@ -207,7 +207,10 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     print("================================")
 
-    if Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1:
+    if (
+        Mejores_individuos[0]["contador_movimientos"] == pasos_maximos + 1
+        or Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1
+    ):
         return "Ningún individuo llegó al final"
 
     elif (
@@ -219,7 +222,6 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
                 \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {Mejores_individuos[1]['contador_movimientos']}"
         )
         return Mejores_individuos
-    return "Ningún individuo llegó al final"
 
 
 def funcionamiento_principal(
