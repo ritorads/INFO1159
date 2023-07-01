@@ -222,6 +222,7 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
                 \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
         )
         return Mejores_individuos
+    return "Ningún individuo llegó al final"
 
 
 def funcionamiento_principal(
@@ -254,12 +255,6 @@ def funcionamiento_principal(
                 or Generacion_Actual == Cantidad_generaciones
             ):
                 print("ninguno LLegó al final")
-        # nueva_poblacion = reproduccion(resultado) # resultados lleva los 2 mejores individuos
-        ### TODO LO DEMAS ####
-
-        # poblacion = nueva_poblacion
-        ### TODO LO DEMAS ####
-        return 0
 
 
 def cruzar_cromosomas(Mejores_individuos):
@@ -314,13 +309,13 @@ def mutar_cromosomas(cromosoma):
     return cromosoma
 
 
+if __name__ == "__main__":
+    funcionamiento_principal(40, 20, 70)
+
 ##############################################################################################################
 ##############################################################################################################
 ##############################################################################################################
 ##############################################################################################################
 
-
-# funcionamiento_principal(40,20,70) # 40 generaciones, 20 individuos, 70 pasos
-asd = funcionamiento_principal(30, 20, 40)
 
 # PRUEBA = funcionamiento_principal(40,20,70)
