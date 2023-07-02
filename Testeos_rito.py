@@ -39,13 +39,12 @@ def creacion_cromosomas(num_genes, contador_movimientos):
     return cromosoma
 
 
-def plot_cuadricula(poblacion, num_generaciones):
+def plot_cuadricula(poblacion, num_generaciones, color):
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
     pasos_maximos = poblacion[0]["contador_movimientos"]
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    colores = ["#0330FF"] * num_individuos
 
     ax.set_xticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
     ax.set_yticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
@@ -65,7 +64,7 @@ def plot_cuadricula(poblacion, num_generaciones):
         cuadricula[i][0] = i + 1
         individuo["posiciones"] = [(i, 0)]
 
-    img = ax.matshow(cuadricula, cmap="Blues")
+    img = ax.matshow(cuadricula, cmap=color)
     plt.draw()
     plt.pause(0.1)
 
@@ -186,12 +185,16 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     print("INDIVIDUOS QUE LLEGARON AL FINAL")
     print("================================")
     for i, individuo in enumerate(poblacion):
+        posicion_1 = individuo["posiciones"]
+        posiciones_sin_repetir = len(list(set(posicion_1)))
+
+        print(f"posiciones :{posiciones_sin_repetir}")
+        print(f"cantidad de pasos : {posiciones_sin_repetir}")
+        individuo["contador_movimientos"] = posiciones_sin_repetir
         individuo["id"] = i + 1
+
         if individuo["posicion_actual"][1] == tamano_tablero - 1:
-            if (
-                individuo["contador_movimientos"]
-                < Mejores_individuos[0]["contador_movimientos"]
-            ):
+            if posiciones_sin_repetir < Mejores_individuos[0]["contador_movimientos"]:
                 Mejores_individuos[1] = Mejores_individuos[0]
                 Mejores_individuos[0] = individuo
 
@@ -234,25 +237,24 @@ def funcionamiento_principal(
             poblacion = crear_poblacion(
                 Cantidad_Individuos, cantidad_movimientos
             )  # Ejemplo con 10 individuos y 10 movimientos
-            resultado = plot_cuadricula(poblacion, Generacion_Actual)
+            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
             Generacion_Actual += 1
             if (
                 resultado != "Ningún individuo llegó al final"
                 or Generacion_Actual == Cantidad_generaciones
             ):
                 Hay_mutacion = 1
-            else:
-                print(resultado)
+                break
 
         while Hay_mutacion == 1:
             poblacion = cruzar_cromosomas(resultado)
-            resultado = plot_cuadricula(poblacion, Generacion_Actual)
+            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Reds")
             Generacion_Actual += 1
             if (
                 resultado != "Ningún individuo llegó al final"
                 or Generacion_Actual == Cantidad_generaciones
             ):
-                print("ninguno LLegó al finaaaaaaal")
+                print("llegóooo")
                 break
 
 
@@ -263,10 +265,19 @@ def cruzar_cromosomas(Mejores_individuos):
     individuo_1 = Mejores_individuos[0]
     individuo_2 = Mejores_individuos[1]
 
+    print(f"individuo 1 : {Mejores_individuos}")
+
     # Seleccionar los cromosomas de los dos mejores individuos
     cromosoma_1 = individuo_1["genes"]
     cromosoma_2 = individuo_2["genes"]
 
+    # posiciones
+    posicion_1 = individuo_1["posiciones"]
+
+    posiciones_sin_repetir = list(set(posicion_1))
+
+    # print(f"posiciones :{posiciones_sin_repetir}")
+    # print(f"cantidad de pasos : {len(posiciones_sin_repetir)}")
     # Crear la nueva población
     nueva_poblacion = []
 
@@ -294,7 +305,7 @@ def mutar_cromosomas(cromosoma):
     gen_a_mutar = random.randint(0, len(cromosoma) - 1)
 
     # Seleccionar el nuevo valor del gen < 1
-    nuevo_valor = random.randint(0, 1)
+    nuevo_valor = random.uniform(0, 0.5)
 
     # Mutar el gen
     cromosoma[gen_a_mutar] = nuevo_valor
