@@ -166,6 +166,7 @@ def plot_cuadricula(poblacion, num_generaciones, color):
 
     for individuo in poblacion:
         individuo["posicion_actual"] = individuo["posiciones"][-1]
+    print("================================")
 
     seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
     return seleccion
@@ -189,8 +190,6 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         posicion_1 = individuo["posiciones"]
         posiciones_sin_repetir = len(list(set(posicion_1)))
 
-        print(f"posiciones :{posiciones_sin_repetir}")
-        print(f"cantidad de pasos : {posiciones_sin_repetir}")
         individuo["contador_movimientos"] = posiciones_sin_repetir
         individuo["id"] = i + 1
 
