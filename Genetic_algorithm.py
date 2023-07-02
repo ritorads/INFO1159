@@ -15,7 +15,6 @@ def crear_poblacion(num_individuos, contador_movimientos):
     for _ in range(num_individuos):
         cromosoma = creacion_cromosomas(8, contador_movimientos)
         poblacion.append(cromosoma)
-    print(poblacion)
 
     return poblacion
 
@@ -26,9 +25,6 @@ def creacion_cromosomas(num_genes, contador_movimientos):
 
     # Normaliza el vector de probabilidades
     probabilidades = normalizar_vector(probabilidades)
-    print("-------------------")
-    print(probabilidades)
-    print("-------------------")
 
     # Crea el cromosoma con probabilidades aleatorias, contador de movimientos y posición actual
     cromosoma = {
@@ -43,7 +39,7 @@ def creacion_cromosomas(num_genes, contador_movimientos):
     return cromosoma
 
 
-def plot_cuadricula(poblacion, num_generaciones):
+def plot_cuadricula(poblacion, num_generaciones, color):
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
     pasos_maximos = poblacion[0]["contador_movimientos"]
@@ -68,7 +64,7 @@ def plot_cuadricula(poblacion, num_generaciones):
         cuadricula[i][0] = i + 1
         individuo["posiciones"] = [(i, 0)]
 
-    img = ax.matshow(cuadricula, cmap="Blues")
+    img = ax.matshow(cuadricula, cmap=color)
     plt.draw()
     plt.pause(0.1)
 
@@ -189,12 +185,16 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     print("INDIVIDUOS QUE LLEGARON AL FINAL")
     print("================================")
     for i, individuo in enumerate(poblacion):
+        posicion_1 = individuo["posiciones"]
+        posiciones_sin_repetir = len(list(set(posicion_1)))
+
+        print(f"posiciones :{posiciones_sin_repetir}")
+        print(f"cantidad de pasos : {posiciones_sin_repetir}")
+        individuo["contador_movimientos"] = posiciones_sin_repetir
         individuo["id"] = i + 1
+
         if individuo["posicion_actual"][1] == tamano_tablero - 1:
-            if (
-                individuo["contador_movimientos"]
-                < Mejores_individuos[0]["contador_movimientos"]
-            ):
+            if posiciones_sin_repetir < Mejores_individuos[0]["contador_movimientos"]:
                 Mejores_individuos[1] = Mejores_individuos[0]
                 Mejores_individuos[0] = individuo
 
@@ -210,7 +210,10 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
 
     print("================================")
 
-    if Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1:
+    if (
+        Mejores_individuos[0]["contador_movimientos"] == pasos_maximos + 1
+        or Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1
+    ):
         return "Ningún individuo llegó al final"
 
     elif (
@@ -218,11 +221,10 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         and Mejores_individuos[0]["contador_movimientos"] != pasos_maximos + 1
     ):
         print(
-            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[0]['contador_movimientos']} \
-                \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {pasos_maximos - Mejores_individuos[1]['contador_movimientos']}"
+            f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {Mejores_individuos[0]['contador_movimientos']} \
+                \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {Mejores_individuos[1]['contador_movimientos']}"
         )
         return Mejores_individuos
-    return "Ningún individuo llegó al final"
 
 
 def funcionamiento_principal(
@@ -235,42 +237,47 @@ def funcionamiento_principal(
             poblacion = crear_poblacion(
                 Cantidad_Individuos, cantidad_movimientos
             )  # Ejemplo con 10 individuos y 10 movimientos
-            resultado = plot_cuadricula(poblacion, Generacion_Actual)
+            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
             Generacion_Actual += 1
             if (
                 resultado != "Ningún individuo llegó al final"
                 or Generacion_Actual == Cantidad_generaciones
             ):
                 Hay_mutacion = 1
-            else:
-                print(resultado)
+                break
 
         while Hay_mutacion == 1:
             poblacion = cruzar_cromosomas(resultado)
-            print(poblacion)
-            resultado = plot_cuadricula(poblacion, Generacion_Actual)
+            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Reds")
             Generacion_Actual += 1
             if (
                 resultado != "Ningún individuo llegó al final"
                 or Generacion_Actual == Cantidad_generaciones
             ):
-                print("ninguno LLegó al final")
+                print("llegóooo")
+                break
 
 
 def cruzar_cromosomas(Mejores_individuos):
     print("Cruce de cromosomas")
-    print("===================")
 
     # Seleccionar los dos mejores individuos
     individuo_1 = Mejores_individuos[0]
     individuo_2 = Mejores_individuos[1]
 
+    print(f"individuo 1 : {Mejores_individuos}")
+
     # Seleccionar los cromosomas de los dos mejores individuos
     cromosoma_1 = individuo_1["genes"]
     cromosoma_2 = individuo_2["genes"]
 
-    # Seleccionar el punto de cruce
+    # posiciones
+    posicion_1 = individuo_1["posiciones"]
 
+    posiciones_sin_repetir = list(set(posicion_1))
+
+    # print(f"posiciones :{posiciones_sin_repetir}")
+    # print(f"cantidad de pasos : {len(posiciones_sin_repetir)}")
     # Crear la nueva población
     nueva_poblacion = []
 
@@ -279,19 +286,16 @@ def cruzar_cromosomas(Mejores_individuos):
         gen_hijo = cromosoma_1[:punto_cruce] + cromosoma_2[punto_cruce:]
         gen_mutado = mutar_cromosomas(gen_hijo)
         gen_mutado_normalizado = normalizar_vector(gen_mutado)
-        print(gen_mutado_normalizado)
 
         cromosomas_hijos = {
             "genes": gen_mutado_normalizado,
             "contador_movimientos": 40,
-            "posicion_actual": (0, 0),
+            "posicion_actual": [0],
         }
-        print("-------------------")
-        print(gen_mutado_normalizado)
         nueva_poblacion.append(cromosomas_hijos)
 
-    for i, individuos in enumerate(nueva_poblacion):
-        print(f"Individuo {i} : {individuos['genes']}")
+    # for i, individuos in enumerate(nueva_poblacion):
+    #    print(f"Individuo {i} : {individuos['genes']}")
 
     return nueva_poblacion
 
@@ -301,7 +305,7 @@ def mutar_cromosomas(cromosoma):
     gen_a_mutar = random.randint(0, len(cromosoma) - 1)
 
     # Seleccionar el nuevo valor del gen < 1
-    nuevo_valor = random.randint(0, 1)
+    nuevo_valor = random.uniform(0, 0.5)
 
     # Mutar el gen
     cromosoma[gen_a_mutar] = nuevo_valor
