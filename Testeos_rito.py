@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
 
 def normalizar_vector(vector):
@@ -214,7 +215,7 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         Mejores_individuos[0]["contador_movimientos"] == pasos_maximos + 1
         or Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1
     ):
-        return "Ningún individuo llegó al final"
+        return []  # Return an empty list instead of the string
 
     elif (
         Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1
@@ -227,54 +228,18 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         return Mejores_individuos
 
 
-def funcionamiento_principal(
-    Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
-):  ## def Obtener2padres():
-    Generacion_Actual = 0
-    Hay_mutacion = 0
-    while Generacion_Actual < Cantidad_generaciones:
-        while Hay_mutacion == 0:
-            poblacion = crear_poblacion(
-                Cantidad_Individuos, cantidad_movimientos
-            )  # Ejemplo con 10 individuos y 10 movimientos
-            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
-            Generacion_Actual += 1
-            if (
-                resultado != "Ningún individuo llegó al final"
-                or Generacion_Actual == Cantidad_generaciones
-            ):
-                Hay_mutacion = 1
-                break
-
-        while Hay_mutacion == 1:
-            poblacion = cruzar_cromosomas(resultado)
-            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Reds")
-            Generacion_Actual += 1
-            if (
-                resultado != "Ningún individuo llegó al final"
-                or Generacion_Actual == Cantidad_generaciones
-            ):
-                print("llegóooo")
-                break
-
-
 def cruzar_cromosomas(Mejores_individuos):
-    print("Cruce de cromosomas")
+    print("Tenemos Cruce")
 
     # Seleccionar los dos mejores individuos
     individuo_1 = Mejores_individuos[0]
     individuo_2 = Mejores_individuos[1]
 
-    print(f"individuo 1 : {Mejores_individuos}")
-
     # Seleccionar los cromosomas de los dos mejores individuos
     cromosoma_1 = individuo_1["genes"]
     cromosoma_2 = individuo_2["genes"]
 
-    # posiciones
-    posicion_1 = individuo_1["posiciones"]
-
-    posiciones_sin_repetir = list(set(posicion_1))
+    print(individuo_1["contador_movimientos"])
 
     # print(f"posiciones :{posiciones_sin_repetir}")
     # print(f"cantidad de pasos : {len(posiciones_sin_repetir)}")
@@ -313,8 +278,50 @@ def mutar_cromosomas(cromosoma):
     return cromosoma
 
 
+def funcionamiento_principal(
+    Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
+):  ## def Obtener2padres():
+    Generacion_Actual = 0
+    Hay_mutacion = 0
+    while Generacion_Actual < Cantidad_generaciones:
+        while Hay_mutacion == 0:
+            poblacion = crear_poblacion(
+                Cantidad_Individuos, cantidad_movimientos
+            )  # Ejemplo con 10 individuos y 10 movimientos
+            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
+            Generacion_Actual += 1
+
+            if resultado != [] or Generacion_Actual == Cantidad_generaciones:
+                Hay_mutacion = 1
+                break
+
+        while Hay_mutacion == 1:
+            poblacion = cruzar_cromosomas(resultado)
+            resultado_mutado = plot_cuadricula(
+                poblacion, Generacion_Actual, color="Reds"
+            )
+            Generacion_Actual += 1
+            # resultado = [] or poblacion
+
+            if resultado_mutado != [] or Generacion_Actual == Cantidad_generaciones:
+                print("llegóooo")
+                break
+
+
 if __name__ == "__main__":
-    funcionamiento_principal(40, 20, 70)
+    parser = argparse.ArgumentParser(description="Algoritmo genético")
+    parser.add_argument(
+        "--generaciones", type=int, help="Cantidad de generaciones maximas"
+    )
+    parser.add_argument("--individuos", type=int, help="Cantidad Individuos")
+    parser.add_argument("--movimientos", type=int, help="Cantidad de movimientos")
+    args = parser.parse_args()
+    funcionamiento_principal(args.generaciones, args.individuos, args.movimientos)
+
+    # funcionamiento_principal(40, 20, 70)
+
+    # python .\Testeos_rito.py --generaciones 20 --individuos 20 --movimientos 50
+    # Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
 
 ##############################################################################################################
 ##############################################################################################################
