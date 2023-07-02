@@ -330,7 +330,7 @@ def mutar_cromosomas(cromosoma):
 
     return cromosoma
 
-
+##
 if __name__ == "__main__":
     funcionamiento_principal(5, 20, 10) # Cantidad de generaciones, cantidad de individuos, cantidad de movimientos
 
