@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
 
 def normalizar_vector(vector):
@@ -38,6 +39,140 @@ def creacion_cromosomas(num_genes, contador_movimientos):
 
     return cromosoma
 
+def plot_cuadricula_Mutados(poblacion, num_generaciones, color):
+    num_individuos = len(poblacion)
+    tamano_tablero = num_individuos
+    pasos_maximos = poblacion[0]["contador_movimientos"]
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    ax.set_xticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
+    ax.set_yticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
+
+    ax.set_xlabel("DIRECION HACIA LA META -->")
+    ax.set_ylabel("INICIO DE INDIVIDUOS")
+    ax.grid(which="minor", color="black", linestyle="-", linewidth=1)
+
+    plt.xlabel("Columna")
+    plt.ylabel("Fila")
+
+    plt.ion()
+
+    cuadricula = np.zeros((tamano_tablero, tamano_tablero))
+
+    for i, individuo in enumerate(poblacion):
+        cuadricula[i][0] = i + 1
+        individuo["posiciones"] = [(i, 0)]
+
+    img = ax.matshow(cuadricula, cmap=color)
+    plt.draw()
+    plt.pause(0.1)
+    cantidad_finalistas = 0
+
+    for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
+        ax.set_title(f"GENERACION {num_generaciones + 1}, paso {paso + 1}")
+        # print(f"Paso {paso}:")
+        for i, individuo in enumerate(poblacion):
+            movimientos = [
+                "sur",
+                "este",
+                "oeste",
+                "noreste",
+                "noroeste",
+                "sureste",
+                "suroeste",
+                "mantener",
+            ]
+            probabilidades = normalizar_vector(individuo["genes"])
+            movimiento = np.random.choice(movimientos, p=probabilidades)
+
+            posicion_actual = individuo["posiciones"][-1]
+
+            nueva_fila, nueva_columna = posicion_actual
+
+            if nueva_columna == 0:
+                if movimiento == "oeste":
+                    movimiento = "este"
+                elif movimiento == "noroeste":
+                    movimiento = "noreste"
+                elif movimiento == "suroeste":
+                    movimiento = "sureste"
+
+            if nueva_columna == tamano_tablero - 1:
+                movimiento = "mantener"
+
+            if movimiento == "sur":
+                nueva_fila -= 1
+                if nueva_fila < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "este":
+                nueva_columna += 1
+                if nueva_columna >= tamano_tablero:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "oeste":
+                nueva_columna -= 1
+                if nueva_columna < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "noreste":
+                nueva_fila -= 1
+                nueva_columna += 1
+                if nueva_fila < 0 or nueva_columna >= tamano_tablero:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "noroeste":
+                nueva_fila -= 1
+                nueva_columna -= 1
+                if nueva_fila < 0 or nueva_columna < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "sureste":
+                nueva_fila += 1
+                nueva_columna += 1
+                if nueva_fila >= tamano_tablero or nueva_columna >= tamano_tablero:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "suroeste":
+                nueva_fila += 1
+                nueva_columna -= 1
+                if nueva_fila >= tamano_tablero or nueva_columna < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "mantener":
+                nueva_fila, nueva_columna = posicion_actual
+
+            if cuadricula[nueva_fila][nueva_columna] != 0:
+                movimiento = "mantener"
+                nueva_fila, nueva_columna = posicion_actual
+
+            individuo["posiciones"].append((nueva_fila, nueva_columna))
+
+            if nueva_columna != tamano_tablero - 1:
+                individuo["contador_movimientos"] -= 1
+
+        cuadricula = np.zeros((tamano_tablero, tamano_tablero))
+
+        for i, individuo in enumerate(poblacion):
+            fila, columna = individuo["posiciones"][-1]
+            cuadricula[fila][columna] = i + 1
+
+        img.set_data(cuadricula)
+
+        plt.draw()
+        plt.pause(0.1)
+    plt.close()
+
+    for individuo in poblacion:
+        individuo["posicion_actual"] = individuo["posiciones"][-1]
+    
+    for individuo in poblacion:
+         if individuo["posicion_actual"][1] == 18:
+            cantidad_finalistas += 1
+
+    seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
+    return seleccion, cantidad_finalistas
 
 def plot_cuadricula(poblacion, num_generaciones, color):
     num_individuos = len(poblacion)
@@ -195,9 +330,9 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     for i, individuo in enumerate(poblacion):
         posicion_1 = individuo["posiciones"]
         posiciones_sin_repetir = len(list(set(posicion_1)))
-
-        print(f"posiciones :{posiciones_sin_repetir}")
-        print(f"cantidad de pasos : {posiciones_sin_repetir}")
+        print(f"individuo {i}, posiciones {posiciones_sin_repetir}")
+        # print(f"posiciones :{posiciones_sin_repetir}")
+        # print(f"cantidad de pasos : {posiciones_sin_repetir}")
         individuo["contador_movimientos"] = posiciones_sin_repetir
         individuo["id"] = i + 1
 
@@ -222,7 +357,7 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         Mejores_individuos[0]["contador_movimientos"] == pasos_maximos + 1
         or Mejores_individuos[1]["contador_movimientos"] == pasos_maximos + 1
     ):
-        return "Ningún individuo llegó al final"
+        return []  # Return an empty list instead of the string
 
     elif (
         Mejores_individuos[1]["contador_movimientos"] != pasos_maximos + 1
@@ -235,45 +370,71 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         return Mejores_individuos
 
 
-def funcionamiento_principal(Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos):
+def funcionamiento_principal(
+    Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
+):  ## def Obtener2padres():
     cantidades = []
     Generacion_Actual = 0
     Hay_mutacion = 0
-
     while Generacion_Actual < Cantidad_generaciones:
         while Hay_mutacion == 0:
-            poblacion = crear_poblacion(Cantidad_Individuos, cantidad_movimientos)
+            poblacion = crear_poblacion(
+                Cantidad_Individuos, cantidad_movimientos
+            )  # Ejemplo con 10 individuos y 10 movimientos
             resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
             cantidades.append(resultado[1])
             Generacion_Actual += 1
-            if resultado[0] != "Ningún individuo llegó al final" or Generacion_Actual == Cantidad_generaciones:
+            if resultado[0] != [] or Generacion_Actual == Cantidad_generaciones:
                 Hay_mutacion = 1
                 break
+        ###################################################    
         if Generacion_Actual == Cantidad_generaciones:
             break    
-        print("XDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+        ###################################################
         while Hay_mutacion == 1:
             poblacion = cruzar_cromosomas(resultado[0])
-            resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Reds")
-            cantidades.append(resultado[1])
+            resultado_mutado = plot_cuadricula_Mutados(poblacion, Generacion_Actual, color="Reds")
+            cantidades.append(resultado_mutado[1])
             Generacion_Actual += 1
-            if resultado != "Ningún individuo llegó al final" or Generacion_Actual == Cantidad_generaciones:
+            # resultado = [] or poblacion
+
+            if resultado_mutado != [] or Generacion_Actual == Cantidad_generaciones:
+                print("llegóooo")
                 break
 
-    # Generar gráfico
-    generaciones = list(range(Generacion_Actual))
-    plt.plot(generaciones, cantidades)
-    plt.xlabel('Generación')
-    plt.ylabel('Cantidad de finalistas')
-    plt.title('Evolución de la cantidad de finalistas por generación')
-    plt.savefig('grafico.png')  # Guardar el gráfico como archivo de imagen
-    plt.close()  # Cerrar la figura para liberar memoria
+   
+    generaciones = list(range(Cantidad_generaciones))
+    porcentajes = [finalistas / Cantidad_Individuos * 100 for finalistas in cantidades]
+    print(cantidades)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 8))
 
-    # Abrir el archivo de imagen para ver el gráfico
+    # Gráfico de la cantidad de individuos que llegaron
+    ax1.plot(generaciones, cantidades)
+    ax1.set_xlabel('Generación')
+    ax1.set_ylabel('Cantidad de finalistas')
+    ax1.set_title('Evolución de la cantidad de finalistas por generación')
+
+    # Agregar el porcentaje sobre cada punto del gráfico de cantidad
+    for gen, cant in zip(generaciones, cantidades):
+        ax1.text(gen, cant, f'{cant:.2f}', ha='center', va='bottom')
+
+    # Gráfico del porcentaje de individuos que llegaron
+    ax2.plot(generaciones, porcentajes)
+    ax2.set_xlabel('Generación')
+    ax2.set_ylabel('Porcentaje de finalistas')
+    ax2.set_title('Evolución del porcentaje de finalistas por generación')
+
+    # Agregar el porcentaje sobre cada punto del gráfico de porcentaje
+    for gen, pct in zip(generaciones, porcentajes):
+        ax2.text(gen, pct, f'{pct:.2f}%', ha='center', va='bottom')
+
+    plt.tight_layout()  # Ajustar el espacio entre los subgráficos
+    plt.savefig('grafico.png')
+    plt.close()
+
+    # Abrir el archivo de imagen para ver los gráficos
     from PIL import Image
     Image.open('grafico.png').show()
-
-
 
 def cruzar_cromosomas(Mejores_individuos):
     print("Cruce de cromosomas")
@@ -282,7 +443,7 @@ def cruzar_cromosomas(Mejores_individuos):
     individuo_1 = Mejores_individuos[0]
     individuo_2 = Mejores_individuos[1]
 
-    print(f"individuo 1 : {Mejores_individuos}")
+    # print(f"individuo 1 : {Mejores_individuos}")
 
     # Seleccionar los cromosomas de los dos mejores individuos
     cromosoma_1 = individuo_1["genes"]
@@ -329,15 +490,26 @@ def mutar_cromosomas(cromosoma):
 
     return cromosoma
 
-##
+
 if __name__ == "__main__":
-    funcionamiento_principal(40, 20, 35) # Cantidad de generaciones, cantidad de individuos, cantidad de movimientos
+    parser = argparse.ArgumentParser(description="Algoritmo genético")
+    parser.add_argument(
+        "--generaciones", type=int, help="Cantidad de generaciones maximas"
+    )
+    parser.add_argument("--individuos", type=int, help="Cantidad Individuos")
+    parser.add_argument("--movimientos", type=int, help="Cantidad de movimientos")
+    args = parser.parse_args()
+    funcionamiento_principal(args.generaciones, args.individuos, args.movimientos)
+
+    # funcionamiento_principal(40, 20, 70)
+
+    # python .\Testeos_rito.py --generaciones 20 --individuos 20 --movimientos 50
+    # Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
 
 ##############################################################################################################
 ##############################################################################################################
 ##############################################################################################################
 ##############################################################################################################
-
 
 
 # PRUEBA = funcionamiento_principal(40,20,70)
