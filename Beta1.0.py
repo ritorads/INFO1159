@@ -3,38 +3,39 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
-
 def normalizar_vector(vector):
     suma = sum(vector)
     vector_normalizado = [valor / suma for valor in vector]
     return vector_normalizado
 
-
-def crear_poblacion(num_individuos, contador_movimientos):
+def crear_poblacion(num_individuos, contador_movimientos,probabilidad_asesino):
     poblacion = []
 
     for _ in range(num_individuos):
-        cromosoma = creacion_cromosomas(8, contador_movimientos)
+        cromosoma = creacion_cromosomas(8, contador_movimientos,probabilidad_asesino)
         poblacion.append(cromosoma)
 
     return poblacion
 
-
-def creacion_cromosomas(num_genes, contador_movimientos):
+def creacion_cromosomas(num_genes, contador_movimientos,probabilidad_asesino):
     # Genera las probabilidades aleatorias
     probabilidades = [random.random() for _ in range(num_genes)]
 
     # Normaliza el vector de probabilidades
     probabilidades = normalizar_vector(probabilidades)
 
+    # Genera el campo "ID" con la probabilidad para asesinos o normales
+    if random.random() < probabilidad_asesino:
+        ID = "A"
+    else:
+        ID = "N"
+
     # Crea el cromosoma con probabilidades aleatorias, contador de movimientos y posición actual
     cromosoma = {
         "genes": probabilidades,
         "contador_movimientos": contador_movimientos,
-        "posicion_actual": (
-            0,
-            0,
-        ),  # Inicialmente todos los individuos están en la posición (0, 0)
+        "posicion_actual": (0, 0),
+        "ID": ID,  # Agrega el campo "ID" al cromosoma
     }
 
     return cromosoma
@@ -68,7 +69,7 @@ def plot_cuadricula_Mutados(poblacion, num_generaciones, color):
     plt.draw()
     plt.pause(0.1)
     cantidad_finalistas = 0
-
+    cantidad_asesinados = 0
     for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
         ax.set_title(f"GENERACION {num_generaciones + 1}, paso {paso + 1}")
         # print(f"Paso {paso}:")
@@ -144,35 +145,43 @@ def plot_cuadricula_Mutados(poblacion, num_generaciones, color):
                 nueva_fila, nueva_columna = posicion_actual
 
             if cuadricula[nueva_fila][nueva_columna] != 0:
-                movimiento = "mantener"
-                nueva_fila, nueva_columna = posicion_actual
+                if individuo["ID"] == "N":
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+                elif individuo["ID"] == "A":
+                     # Eliminar el individuo de la población
+                    print("se elimino un individuo")
+                    cantidad_asesinados += 1
+                    poblacion = [ind for ind in poblacion if ind != individuo]
 
             individuo["posiciones"].append((nueva_fila, nueva_columna))
 
             if nueva_columna != tamano_tablero - 1:
                 individuo["contador_movimientos"] -= 1
 
-        cuadricula = np.zeros((tamano_tablero, tamano_tablero))
+    cuadricula = np.zeros((tamano_tablero, tamano_tablero))
 
-        for i, individuo in enumerate(poblacion):
-            fila, columna = individuo["posiciones"][-1]
-            cuadricula[fila][columna] = i + 1
+    for i, individuo in enumerate(poblacion):
+        fila, columna = individuo["posiciones"][-1]
+        cuadricula[fila][columna] = i + 1
 
-        img.set_data(cuadricula)
+    img.set_data(cuadricula)
 
-        plt.draw()
-        plt.pause(0.1)
+    plt.draw()
+    plt.pause(1)
     plt.close()
 
     for individuo in poblacion:
         individuo["posicion_actual"] = individuo["posiciones"][-1]
     
     for individuo in poblacion:
-         if individuo["posicion_actual"][1] == 18:
+         if individuo["posicion_actual"][1] == tamano_tablero - 1:
             cantidad_finalistas += 1
 
     seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
-    return seleccion, cantidad_finalistas
+    print(f"cantidad de finalistas: {cantidad_finalistas}")
+
+    return seleccion, cantidad_finalistas, cantidad_asesinados
 
 def plot_cuadricula(poblacion, num_generaciones, color):
     num_individuos = len(poblacion)
@@ -203,7 +212,7 @@ def plot_cuadricula(poblacion, num_generaciones, color):
     plt.draw()
     plt.pause(0.1)
     cantidad_finalistas = 0
-
+    cantidad_asesinados = 0
     for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
         ax.set_title(f"GENERACION {num_generaciones + 1}, paso {paso + 1}")
         # print(f"Paso {paso}:")
@@ -279,16 +288,19 @@ def plot_cuadricula(poblacion, num_generaciones, color):
                 nueva_fila, nueva_columna = posicion_actual
 
             if cuadricula[nueva_fila][nueva_columna] != 0:
-                movimiento = "mantener"
-                nueva_fila, nueva_columna = posicion_actual
+                if individuo["ID"] == "N":
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+                elif individuo["ID"] == "A":
+                     # Eliminar el individuo de la población
+                    print("se elimino un individuo")
+                    cantidad_asesinados += 1
+                    poblacion = [ind for ind in poblacion if ind != individuo]
 
             individuo["posiciones"].append((nueva_fila, nueva_columna))
 
             if nueva_columna != tamano_tablero - 1:
                 individuo["contador_movimientos"] -= 1
-
-            #if nueva_columna == tamano_tablero - 1:  # Check if reached last column
-                #cantidad_finalistas += 1
 
     cuadricula = np.zeros((tamano_tablero, tamano_tablero))
 
@@ -306,18 +318,12 @@ def plot_cuadricula(poblacion, num_generaciones, color):
         individuo["posicion_actual"] = individuo["posiciones"][-1]
     
     for individuo in poblacion:
-         if individuo["posicion_actual"][1] == 18:
+         if individuo["posicion_actual"][1] == tamano_tablero - 1:
             cantidad_finalistas += 1
 
     seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
-    return seleccion, cantidad_finalistas
-
-
-##############################################################################################################
-##############################################################################################################
-##############################################################################################################
-# no tocar, trabajando aquí
-
+    print(f"cantidad de finalistas: {cantidad_finalistas}")
+    return seleccion, cantidad_finalistas, cantidad_asesinados
 
 def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
     gen_prueba = [
@@ -369,20 +375,18 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
         )
         return Mejores_individuos
 
-
 def funcionamiento_principal(
-    Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
-):  ## def Obtener2padres():
+    Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos, probabilidad_asesino):  ## def Obtener2padres():
     cantidades = []
+    asesinados = []
     Generacion_Actual = 0
     Hay_mutacion = 0
     while Generacion_Actual < Cantidad_generaciones:
         while Hay_mutacion == 0:
-            poblacion = crear_poblacion(
-                Cantidad_Individuos, cantidad_movimientos
-            )  # Ejemplo con 10 individuos y 10 movimientos
+            poblacion = crear_poblacion(Cantidad_Individuos, cantidad_movimientos,probabilidad_asesino)  # Ejemplo con 10 individuos y 10 movimientos
             resultado = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
             cantidades.append(resultado[1])
+            asesinados.append(resultado[2])
             Generacion_Actual += 1
             if resultado[0] != [] or Generacion_Actual == Cantidad_generaciones:
                 Hay_mutacion = 1
@@ -392,9 +396,10 @@ def funcionamiento_principal(
             break    
         ###################################################
         while Hay_mutacion == 1:
-            poblacion = cruzar_cromosomas(resultado[0])
+            poblacion = cruzar_cromosomas(resultado[0],Cantidad_Individuos,probabilidad_asesino)
             resultado_mutado = plot_cuadricula_Mutados(poblacion, Generacion_Actual, color="Reds")
             cantidades.append(resultado_mutado[1])
+            asesinados.append(resultado_mutado[2])
             Generacion_Actual += 1
             # resultado = [] or poblacion
 
@@ -406,7 +411,9 @@ def funcionamiento_principal(
     generaciones = list(range(Cantidad_generaciones))
     porcentajes = [finalistas / Cantidad_Individuos * 100 for finalistas in cantidades]
     print(cantidades)
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 8))
+    print(porcentajes)
+    print(asesinados)
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 10))
 
     # Gráfico de la cantidad de individuos que llegaron
     ax1.plot(generaciones, cantidades)
@@ -428,6 +435,16 @@ def funcionamiento_principal(
     for gen, pct in zip(generaciones, porcentajes):
         ax2.text(gen, pct, f'{pct:.2f}%', ha='center', va='bottom')
 
+    # Gráfico de la cantidad de individuos que murieron
+    ax3.plot(generaciones, asesinados)
+    ax3.set_xlabel('Generación')
+    ax3.set_ylabel('Cantidad de individuos muertos')
+    ax3.set_title('Evolución de la cantidad de individuos muertos por generación')
+
+    # Agregar el número sobre cada punto del gráfico de cantidad de muertos
+    for gen, muertos in zip(generaciones, asesinados):
+        ax3.text(gen, muertos, str(muertos), ha='center', va='bottom')
+
     plt.tight_layout()  # Ajustar el espacio entre los subgráficos
     plt.savefig('grafico.png')
     plt.close()
@@ -436,7 +453,7 @@ def funcionamiento_principal(
     from PIL import Image
     Image.open('grafico.png').show()
 
-def cruzar_cromosomas(Mejores_individuos):
+def cruzar_cromosomas(Mejores_individuos,cantidad_poblacion,probabilidad_asesino):
     print("Cruce de cromosomas")
 
     # Seleccionar los dos mejores individuos
@@ -459,16 +476,20 @@ def cruzar_cromosomas(Mejores_individuos):
     # Crear la nueva población
     nueva_poblacion = []
 
-    for i in range(19):
+    for i in range(cantidad_poblacion):
         punto_cruce = random.randint(0, len(cromosoma_1) - 1)
         gen_hijo = cromosoma_1[:punto_cruce] + cromosoma_2[punto_cruce:]
         gen_mutado = mutar_cromosomas(gen_hijo)
         gen_mutado_normalizado = normalizar_vector(gen_mutado)
-
+        if random.random() < probabilidad_asesino:
+            ID = "A"
+        else:
+            ID = "N"
         cromosomas_hijos = {
             "genes": gen_mutado_normalizado,
             "contador_movimientos": 40,
             "posicion_actual": [0],
+            "ID": ID,
         }
         nueva_poblacion.append(cromosomas_hijos)
 
@@ -476,7 +497,6 @@ def cruzar_cromosomas(Mejores_individuos):
     #    print(f"Individuo {i} : {individuos['genes']}")
 
     return nueva_poblacion
-
 
 def mutar_cromosomas(cromosoma):
     # Seleccionar el gen a mutar
@@ -490,7 +510,6 @@ def mutar_cromosomas(cromosoma):
 
     return cromosoma
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Algoritmo genético")
     parser.add_argument(
@@ -498,18 +517,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("--individuos", type=int, help="Cantidad Individuos")
     parser.add_argument("--movimientos", type=int, help="Cantidad de movimientos")
+    parser.add_argument("--probabilidad", type=float, help="Probabilidad de asesino")
     args = parser.parse_args()
-    funcionamiento_principal(args.generaciones, args.individuos, args.movimientos)
+    funcionamiento_principal(args.generaciones, args.individuos, args.movimientos,args.probabilidad)
 
     # funcionamiento_principal(40, 20, 70)
 
     # python .\Testeos_rito.py --generaciones 20 --individuos 20 --movimientos 50
     # Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
-
-##############################################################################################################
-##############################################################################################################
-##############################################################################################################
-##############################################################################################################
-
-
-# PRUEBA = funcionamiento_principal(40,20,70)
