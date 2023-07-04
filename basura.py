@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import argparse
 from PIL import Image
 
+
 def normalizar_vector(vector):
     suma = sum(vector)
     vector_normalizado = [valor / suma for valor in vector]
@@ -44,7 +45,16 @@ def creacion_cromosomas(num_genes, contador_movimientos, probabilidad_asesino):
     return cromosoma
 
 
-def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color,Probabilidad_asesinar,filas,columnas):
+def plot_cuadricula(
+    opciones,
+    iteraciones,
+    poblacion,
+    num_generaciones,
+    color,
+    Probabilidad_asesinar,
+    filas,
+    columnas,
+):
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
     cantidad_asesinos = 0
@@ -61,9 +71,8 @@ def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color,Pr
         ax.set_ylim([-0.5, filas - 0.5])
         ax.set_xlabel("DIRECION HACIA LA META -->")
         ax.set_ylabel("INICIO DE INDIVIDUOS")
-        ax.set_aspect('equal')
+        ax.set_aspect("equal")
         ax.grid(which="minor", color="black", linestyle="-", linewidth=1)
-
 
         plt.ion()
 
@@ -73,7 +82,7 @@ def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color,Pr
         cuadricula[i][0] = i + 1
         individuo["posiciones"] = [(i, 0)]
 
-    #Opcion para ver la cuadricula    
+    # Opcion para ver la cuadricula
     if opciones == "Si":
         img = ax.matshow(cuadricula, cmap=color)
         plt.draw()
@@ -101,7 +110,7 @@ def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color,Pr
             posicion_actual = individuo["posiciones"][-1]
 
             nueva_fila, nueva_columna = posicion_actual
-            #Condicionales para que no se salga de la cuadricula
+            # Condicionales para que no se salga de la cuadricula
             if nueva_columna == 0:
                 if movimiento == "oeste":
                     movimiento = "este"
@@ -159,42 +168,42 @@ def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color,Pr
                 if individuo["ID"] == "N":
                     movimiento = "mantener"
                     nueva_fila, nueva_columna = posicion_actual
-            ################## CONDICIONAL DEL ASESINO ##################        
+                ################## CONDICIONAL DEL ASESINO ##################
                 elif individuo["ID"] == "A":
                     # Eliminar el individuo de la población
                     if random.random() < Probabilidad_asesinar:
-                     cantidad_asesinados += 1
-                     poblacion = [ind for ind in poblacion if ind != individuo]
+                        cantidad_asesinados += 1
+                        poblacion = [ind for ind in poblacion if ind != individuo]
 
             individuo["posiciones"].append((nueva_fila, nueva_columna))
 
             if nueva_columna != columnas - 1:
                 individuo["contador_movimientos"] -= 1
-    #if que imprime la matriz de la poblacion         
-    if opciones == "Si":
-        cuadricula = np.zeros((filas, columnas))
+        # if que imprime la matriz de la poblacion
+        if opciones == "Si":
+            cuadricula = np.zeros((filas, columnas))
 
-        for i, individuo in enumerate(poblacion):
-            fila, columna = individuo["posiciones"][-1]
-            cuadricula[fila][columna] = i + 1
+            for i, individuo in enumerate(poblacion):
+                fila, columna = individuo["posiciones"][-1]
+                cuadricula[fila][columna] = i + 1
 
-        img.set_data(cuadricula)
+            img.set_data(cuadricula)
 
-        plt.draw()
-        plt.pause(1)
-        plt.close()
-    #for que actualiza la posicion actual de los individuos
+            plt.draw()
+            plt.pause(1)
+            plt.close()
+    # for que actualiza la posicion actual de los individuos
     for individuo in poblacion:
         individuo["posicion_actual"] = individuo["posiciones"][-1]
-    #for que cuenta la cantidad de finalistas
+    # for que cuenta la cantidad de finalistas
     for individuo in poblacion:
         if individuo["posicion_actual"][1] == tamano_tablero - 1:
             cantidad_finalistas += 1
-    #for para contar cuantos asesinos habia
+    # for para contar cuantos asesinos habia
     for individuo in poblacion:
         if individuo["ID"] == "A":
             cantidad_asesinos += 1
-                    
+
     seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
     print(f"cantidad de finalistas: {cantidad_finalistas}")
     return seleccion, cantidad_finalistas, cantidad_asesinados, cantidad_asesinos
@@ -269,9 +278,9 @@ def funcionamiento_principal(
     Hay_mutacion = 0
     opciones_temp = "No"
     Total_Individuos = Cantidad_Individuos
-    Generacion_Actual=0
-    Color_Blue= "Blues"
-    Color_Red= "Reds"
+    Generacion_Actual = 0
+    Color_Blue = "Blues"
+    Color_Red = "Reds"
     while Generacion_Actual < Cantidad_generaciones:
         while Hay_mutacion == 0:
             if Generacion_Actual % iteraciones == 0 and opciones == "Si":
@@ -284,16 +293,28 @@ def funcionamiento_principal(
                 Cantidad_Individuos, cantidad_movimientos, probabilidad_asesino
             )  # Ejemplo con 10 individuos y 10 movimientos
             resultado_A = plot_cuadricula(
-                opciones_temp, iteraciones, poblacion, Generacion_Actual, Color_Blue,Probabilidad_Asesinar,filas,columnas
+                opciones_temp,
+                iteraciones,
+                poblacion,
+                Generacion_Actual,
+                Color_Blue,
+                Probabilidad_Asesinar,
+                filas,
+                columnas,
             )
             cantidades.append(resultado_A[1])
             asesinados.append(resultado_A[2])
             cantidad_asesinos.append(resultado_A[3])
             Generacion_Actual += 1
+
             ##############################################
-            if Generacion_Actual == Cantidad_generaciones:# <-- CONDICIONAL PARA SALIR DEL CICLO SI NO LLEGA NUNCA NADIE EN LAS GENERACIONES
-                break                                     
+            if (
+                Generacion_Actual == Cantidad_generaciones
+            ):  # <-- CONDICIONAL PARA SALIR DEL CICLO SI NO LLEGA NUNCA NADIE EN LAS GENERACIONES
+                print("limite sobrepasado")
+                break
             ##############################################
+
             if resultado_A[0] != []:
                 poblacion = cruzar_cromosomas(
                     resultado_A[0],
@@ -309,14 +330,14 @@ def funcionamiento_principal(
                     Color_Red,
                     Probabilidad_Asesinar,
                     filas,
-                    columnas
+                    columnas,
                 )
                 cantidades.append(resultado[1])
                 asesinados.append(resultado[2])
                 cantidad_asesinos.append(resultado_A[3])
                 resultado_anterior = resultado_A
                 resultado_temp = resultado
-                Generacion_Actual += 1 
+                Generacion_Actual += 1
                 Hay_mutacion = 1
 
         while Hay_mutacion == 1 and Generacion_Actual < Cantidad_generaciones:
@@ -342,13 +363,17 @@ def funcionamiento_principal(
                     Color_Red,
                     Probabilidad_Asesinar,
                     filas,
-                    columnas
+                    columnas,
                 )
-                cantidades.append(resultado[1]) # <-- SE GUARDA LA CANTIDAD DE INDIVIDUOS QUE LLEGARON A LA META
-                asesinados.append(resultado[2]) # <-- SE GUARDA LA CANTIDAD DE INDIVIDUOS QUE FUERON ASESINADOS
+                cantidades.append(
+                    resultado[1]
+                )  # <-- SE GUARDA LA CANTIDAD DE INDIVIDUOS QUE LLEGARON A LA META
+                asesinados.append(
+                    resultado[2]
+                )  # <-- SE GUARDA LA CANTIDAD DE INDIVIDUOS QUE FUERON ASESINADOS
                 cantidad_asesinos.append(resultado_A[3])
-                resultado_anterior = resultado_temp # <-- SE GUARDA EL RESULTADO ANTERIOR PARA QUE SE PUEDA CRUZAR CON EL SIGUIENTE
-                resultado_temp = resultado # <-- SE GUARDA EL RESULTADO ACTUAL PARA QUE SE PUEDA CRUZAR CON EL SIGUIENTE
+                resultado_anterior = resultado_temp  # <-- SE GUARDA EL RESULTADO ANTERIOR PARA QUE SE PUEDA CRUZAR CON EL SIGUIENTE
+                resultado_temp = resultado  # <-- SE GUARDA EL RESULTADO ACTUAL PARA QUE SE PUEDA CRUZAR CON EL SIGUIENTE
 
                 Generacion_Actual += 1
 
@@ -368,20 +393,18 @@ def funcionamiento_principal(
                     Color_Blue,
                     Probabilidad_Asesinar,
                     filas,
-                    columnas
+                    columnas,
                 )
                 cantidades.append(resultado[1])
                 asesinados.append(resultado[2])
                 resultado_anterior = resultado_anterior
                 resultado_temp = resultado
-
-    if Cantidad_generaciones >= Generacion_Actual:
-        print("limite sobrepasado")
+                Generacion_Actual += 1
 
     generaciones = list(range(Cantidad_generaciones))
     porcentajes = [finalistas / Cantidad_Individuos * 100 for finalistas in cantidades]
-    sobrevivientes = [Total_Individuos-asesinados for asesinados in cantidad_asesinos]
-    
+    sobrevivientes = [Total_Individuos - muertos for muertos in asesinados]
+
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 12))
 
     # Gráfico de la cantidad de individuos que llegaron
@@ -405,13 +428,15 @@ def funcionamiento_principal(
         ax2.text(gen, pct, f"{pct:.2f}%", ha="center", va="bottom")
 
     # Gráfico de la cantidad de individuos que murieron
-    ax3.plot(generaciones, cantidad_asesinos)
+    print("-----------------------------------")
+    print(f" cantidad_asesinos : {asesinados} \n cantidad : {len(asesinados)}")
+    ax3.plot(generaciones, asesinados)
     ax3.set_xlabel("Generación")
     ax3.set_ylabel("Cantidad de individuos muertos")
     ax3.set_title("Evolución de la cantidad de individuos muertos por generación")
 
     # Agregar el número sobre cada punto del gráfico de cantidad de muertos
-    for gen, muertos in zip(generaciones, cantidad_asesinos):
+    for gen, muertos in zip(generaciones, asesinados):
         ax3.text(gen, muertos, str(muertos), ha="center", va="bottom")
 
     # Gráfico de la cantidad de sobrevivientes en relación a los asesinos
@@ -422,15 +447,16 @@ def funcionamiento_principal(
 
     # Agregar la cantidad sobre cada punto del gráfico de sobrevivientes
     for gen, sobrevivientes_gen in zip(generaciones, sobrevivientes):
-        ax4.text(gen, sobrevivientes_gen, str(sobrevivientes_gen), ha="center", va="bottom")
+        ax4.text(
+            gen, sobrevivientes_gen, str(sobrevivientes_gen), ha="center", va="bottom"
+        )
 
     plt.tight_layout()  # Ajustar el espacio entre los subgráficos
     plt.savefig("grafico.png")
     plt.close()
 
-# Abrir el archivo de imagen para ver los gráficos
+    # Abrir el archivo de imagen para ver los gráficos
     Image.open("grafico.png").show()
-
 
 
 def cruzar_cromosomas(
@@ -577,7 +603,7 @@ if __name__ == "__main__":
         args.Columnas,
     )
 
-    # funcionamiento_principal(40, 20, 70)
+    # python .\basura.py --generaciones 30 --individuos 20 --movimientos 50 --probabilidad 0.1 --mutacion 0.3 --iteraciones 1 --ProbabilidadAsesinar 0.5 --Filas 20 --Columnas 20 --opciones "Si"
 
     # python .\Testeos_rito.py --generaciones 20 --individuos 20 --movimientos 50
     # Cantidad_generaciones, Cantidad_Individuos, cantidad_movimientos
