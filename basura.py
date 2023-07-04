@@ -56,7 +56,7 @@ def plot_cuadricula(
     columnas,
 ):
     num_individuos = len(poblacion)
-    tamano_tablero = num_individuos
+    tamano_tablero = columnas
     cantidad_asesinos = 0
     pasos_maximos = poblacion[0]["contador_movimientos"]
 
@@ -77,10 +77,15 @@ def plot_cuadricula(
         plt.ion()
 
     cuadricula = np.zeros((filas, columnas))
+    condicion = 0
+
     ##################################################
     for i, individuo in enumerate(poblacion):
-        cuadricula[i][0] = i + 1
-        individuo["posiciones"] = [(i, 0)]
+        fila = i % filas
+        columna = i // filas
+
+        cuadricula[fila][columna] = i + 1
+        individuo["posiciones"] = [(fila, columna)]
 
     # Opcion para ver la cuadricula
     if opciones == "Si":
@@ -179,19 +184,20 @@ def plot_cuadricula(
 
             if nueva_columna != columnas - 1:
                 individuo["contador_movimientos"] -= 1
-        # if que imprime la matriz de la poblacion
-        if opciones == "Si":
-            cuadricula = np.zeros((filas, columnas))
+    # if que imprime la matriz de la poblacion
+    if opciones == "Si":
+        cuadricula = np.zeros((filas, columnas))
 
-            for i, individuo in enumerate(poblacion):
-                fila, columna = individuo["posiciones"][-1]
-                cuadricula[fila][columna] = i + 1
+        for i, individuo in enumerate(poblacion):
+            fila, columna = individuo["posiciones"][-1]
+            cuadricula[fila][columna] = i + 1
 
-            img.set_data(cuadricula)
+        img.set_data(cuadricula)
 
-            plt.draw()
-            plt.pause(1)
-            plt.close()
+        plt.draw()
+        plt.pause(1)
+        plt.close()
+
     # for que actualiza la posicion actual de los individuos
     for individuo in poblacion:
         individuo["posicion_actual"] = individuo["posiciones"][-1]
@@ -390,7 +396,7 @@ def funcionamiento_principal(
                     iteraciones,
                     poblacion,
                     Generacion_Actual,
-                    Color_Blue,
+                    Color_Red,
                     Probabilidad_Asesinar,
                     filas,
                     columnas,
