@@ -163,8 +163,8 @@ def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color,Pr
                 elif individuo["ID"] == "A":
                     # Eliminar el individuo de la población
                     if random.random() < Probabilidad_asesinar:
-                        cantidad_asesinados += 1
-                        cuadricula[nueva_fila][nueva_columna] = 0
+                     cantidad_asesinados += 1
+                     poblacion = [ind for ind in poblacion if ind != individuo]
 
             individuo["posiciones"].append((nueva_fila, nueva_columna))
 
