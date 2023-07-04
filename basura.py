@@ -576,19 +576,19 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--ProbabilidadAsesinar",
+        "--probabilidad_asesinar",
         type=float,
         help="Probabilidad de Asesinar un individuo",
         required=True,
     )
     parser.add_argument(
-        "--Filas",
+        "--filas",
         type=No_Negatividad,
         help="Cantidad de Filas",
         required=True,
     )
     parser.add_argument(
-        "--Columnas",
+        "--columnas",
         type=No_Negatividad,
         help="Cantidad de Columnas",
         required=True,
@@ -611,9 +611,9 @@ if __name__ == "__main__":
         args.mutacion,
         args.iteraciones,
         args.opciones,
-        args.ProbabilidadAsesinar,
-        args.Filas,
-        args.Columnas,
+        args.probabilidad_asesinar,
+        args.filas,
+        args.columnas,
     )
 
     # python .\basura.py --generaciones 30 --individuos 20 --movimientos 50 --probabilidad 0.1 --mutacion 0.3 --iteraciones 1 --ProbabilidadAsesinar 0.5 --Filas 20 --Columnas 20 --opciones "Si"
