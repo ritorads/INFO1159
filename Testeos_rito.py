@@ -44,38 +44,41 @@ def creacion_cromosomas(num_genes, contador_movimientos, probabilidad_asesino):
     return cromosoma
 
 
-def plot_cuadricula_Mutados(poblacion, num_generaciones, color):
+def plot_cuadricula(opciones, iteraciones, poblacion, num_generaciones, color):
     num_individuos = len(poblacion)
     tamano_tablero = num_individuos
     pasos_maximos = poblacion[0]["contador_movimientos"]
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
 
-    ax.set_xticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
-    ax.set_yticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
+    if opciones == "Si":
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
 
-    ax.set_xlabel("DIRECION HACIA LA META -->")
-    ax.set_ylabel("INICIO DE INDIVIDUOS")
-    ax.grid(which="minor", color="black", linestyle="-", linewidth=1)
+        ax.set_xticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
+        ax.set_yticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
 
-    plt.xlabel("Columna")
-    plt.ylabel("Fila")
+        ax.set_xlabel("DIRECION HACIA LA META -->")
+        ax.set_ylabel("INICIO DE INDIVIDUOS")
+        ax.grid(which="minor", color="black", linestyle="-", linewidth=1)
 
-    plt.ion()
+        plt.xlabel("Columna")
+        plt.ylabel("Fila")
+
+        plt.ion()
 
     cuadricula = np.zeros((tamano_tablero, tamano_tablero))
 
     for i, individuo in enumerate(poblacion):
         cuadricula[i][0] = i + 1
         individuo["posiciones"] = [(i, 0)]
-
-    img = ax.matshow(cuadricula, cmap=color)
-    plt.draw()
-    plt.pause(0.1)
+    if opciones == "Si":
+        img = ax.matshow(cuadricula, cmap=color)
+        plt.draw()
+        plt.pause(0.1)
     cantidad_finalistas = 0
     cantidad_asesinados = 0
     for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
-        ax.set_title(f"GENERACION {num_generaciones + 1}, paso {paso + 1}")
+        if opciones == "Si":
+            ax.set_title(f"GENERACION {num_generaciones}, paso {paso + 1}")
         # print(f"Paso {paso}:")
         for i, individuo in enumerate(poblacion):
             movimientos = [
@@ -162,162 +165,18 @@ def plot_cuadricula_Mutados(poblacion, num_generaciones, color):
 
             if nueva_columna != tamano_tablero - 1:
                 individuo["contador_movimientos"] -= 1
+    if opciones == "Si":
+        cuadricula = np.zeros((tamano_tablero, tamano_tablero))
 
-    cuadricula = np.zeros((tamano_tablero, tamano_tablero))
-
-    for i, individuo in enumerate(poblacion):
-        fila, columna = individuo["posiciones"][-1]
-        cuadricula[fila][columna] = i + 1
-
-    img.set_data(cuadricula)
-
-    plt.draw()
-    plt.pause(1)
-    plt.close()
-
-    for individuo in poblacion:
-        individuo["posicion_actual"] = individuo["posiciones"][-1]
-
-    for individuo in poblacion:
-        if individuo["posicion_actual"][1] == tamano_tablero - 1:
-            cantidad_finalistas += 1
-
-    seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
-    print(f"cantidad de finalistas: {cantidad_finalistas}")
-
-    return seleccion, cantidad_finalistas, cantidad_asesinados
-
-
-def plot_cuadricula(poblacion, num_generaciones, color):
-    num_individuos = len(poblacion)
-    tamano_tablero = num_individuos
-    pasos_maximos = poblacion[0]["contador_movimientos"]
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    ax.set_xticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
-    ax.set_yticks(np.arange(tamano_tablero + 1) - 0.5, minor=True)
-
-    ax.set_xlabel("DIRECION HACIA LA META -->")
-    ax.set_ylabel("INICIO DE INDIVIDUOS")
-    ax.grid(which="minor", color="black", linestyle="-", linewidth=1)
-
-    plt.xlabel("Columna")
-    plt.ylabel("Fila")
-
-    plt.ion()
-
-    cuadricula = np.zeros((tamano_tablero, tamano_tablero))
-
-    for i, individuo in enumerate(poblacion):
-        cuadricula[i][0] = i + 1
-        individuo["posiciones"] = [(i, 0)]
-
-    img = ax.matshow(cuadricula, cmap=color)
-    plt.draw()
-    plt.pause(0.1)
-    cantidad_finalistas = 0
-    cantidad_asesinados = 0
-    for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
-        ax.set_title(f"GENERACION {num_generaciones + 1}, paso {paso + 1}")
-        # print(f"Paso {paso}:")
         for i, individuo in enumerate(poblacion):
-            movimientos = [
-                "sur",
-                "este",
-                "oeste",
-                "noreste",
-                "noroeste",
-                "sureste",
-                "suroeste",
-                "mantener",
-            ]
-            probabilidades = normalizar_vector(individuo["genes"])
-            movimiento = np.random.choice(movimientos, p=probabilidades)
+            fila, columna = individuo["posiciones"][-1]
+            cuadricula[fila][columna] = i + 1
 
-            posicion_actual = individuo["posiciones"][-1]
+        img.set_data(cuadricula)
 
-            nueva_fila, nueva_columna = posicion_actual
-
-            if nueva_columna == 0:
-                if movimiento == "oeste":
-                    movimiento = "este"
-                elif movimiento == "noroeste":
-                    movimiento = "noreste"
-                elif movimiento == "suroeste":
-                    movimiento = "sureste"
-
-            if nueva_columna == tamano_tablero - 1:
-                movimiento = "mantener"
-
-            if movimiento == "sur":
-                nueva_fila -= 1
-                if nueva_fila < 0:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "este":
-                nueva_columna += 1
-                if nueva_columna >= tamano_tablero:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "oeste":
-                nueva_columna -= 1
-                if nueva_columna < 0:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "noreste":
-                nueva_fila -= 1
-                nueva_columna += 1
-                if nueva_fila < 0 or nueva_columna >= tamano_tablero:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "noroeste":
-                nueva_fila -= 1
-                nueva_columna -= 1
-                if nueva_fila < 0 or nueva_columna < 0:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "sureste":
-                nueva_fila += 1
-                nueva_columna += 1
-                if nueva_fila >= tamano_tablero or nueva_columna >= tamano_tablero:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "suroeste":
-                nueva_fila += 1
-                nueva_columna -= 1
-                if nueva_fila >= tamano_tablero or nueva_columna < 0:
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-            elif movimiento == "mantener":
-                nueva_fila, nueva_columna = posicion_actual
-
-            if cuadricula[nueva_fila][nueva_columna] != 0:
-                if individuo["ID"] == "N":
-                    movimiento = "mantener"
-                    nueva_fila, nueva_columna = posicion_actual
-                elif individuo["ID"] == "A":
-                    # Eliminar el individuo de la población
-                    print("se elimino un individuo")
-                    cantidad_asesinados += 1
-                    poblacion = [ind for ind in poblacion if ind != individuo]
-
-            individuo["posiciones"].append((nueva_fila, nueva_columna))
-
-            if nueva_columna != tamano_tablero - 1:
-                individuo["contador_movimientos"] -= 1
-
-    cuadricula = np.zeros((tamano_tablero, tamano_tablero))
-
-    for i, individuo in enumerate(poblacion):
-        fila, columna = individuo["posiciones"][-1]
-        cuadricula[fila][columna] = i + 1
-
-    img.set_data(cuadricula)
-
-    plt.draw()
-    plt.pause(1)
-    plt.close()
+        plt.draw()
+        plt.pause(1)
+        plt.close()
 
     for individuo in poblacion:
         individuo["posicion_actual"] = individuo["posiciones"][-1]
@@ -388,17 +247,29 @@ def funcionamiento_principal(
     cantidad_movimientos,
     probabilidad_asesino,
     Probabilidad_mutacion,
+    iteraciones,
+    opciones,
+    Generacion_Actual,
 ):  ## def Obtener2padres():
     cantidades = []
     asesinados = []
-    Generacion_Actual = 0
     Hay_mutacion = 0
+    opciones_temp = "No"
+
     while Generacion_Actual < Cantidad_generaciones:
         while Hay_mutacion == 0:
+            if Generacion_Actual % iteraciones == 0 and opciones == "Si":
+                print("generacion actual", Generacion_Actual)
+                opciones_temp = "Si"
+            elif Generacion_Actual % iteraciones != 0 and opciones == "Si":
+                opciones_temp = "No"
+
             poblacion = crear_poblacion(
                 Cantidad_Individuos, cantidad_movimientos, probabilidad_asesino
             )  # Ejemplo con 10 individuos y 10 movimientos
-            resultado_A = plot_cuadricula(poblacion, Generacion_Actual, color="Blues")
+            resultado_A = plot_cuadricula(
+                opciones_temp, iteraciones, poblacion, Generacion_Actual, color="Blues"
+            )
             cantidades.append(resultado_A[1])
             asesinados.append(resultado_A[2])
             Generacion_Actual += 1
@@ -410,8 +281,12 @@ def funcionamiento_principal(
                     probabilidad_asesino,
                     Probabilidad_mutacion,
                 )
-                resultado = plot_cuadricula_Mutados(
-                    poblacion, Generacion_Actual, color="Reds"
+                resultado = plot_cuadricula(
+                    opciones_temp,
+                    iteraciones,
+                    poblacion,
+                    Generacion_Actual,
+                    color="Reds",
                 )
                 cantidades.append(resultado[1])
                 asesinados.append(resultado[2])
@@ -421,8 +296,12 @@ def funcionamiento_principal(
                 Hay_mutacion = 1
 
         while Hay_mutacion == 1 and Generacion_Actual < Cantidad_generaciones:
-            print(Cantidad_generaciones)
-            print(Generacion_Actual)
+            if Generacion_Actual % iteraciones == 0 and opciones == "Si":
+                print("generacion actual", Generacion_Actual)
+                opciones_temp = "Si"
+            elif Generacion_Actual % iteraciones != 0 and opciones == "Si":
+                opciones_temp = "No"
+
             if resultado_temp[0] != []:
                 print("mas de one")
                 poblacion = cruzar_cromosomas(
@@ -431,14 +310,20 @@ def funcionamiento_principal(
                     probabilidad_asesino,
                     Probabilidad_mutacion,
                 )
-                resultado = plot_cuadricula_Mutados(
-                    poblacion, Generacion_Actual, color="Reds"
+                resultado = plot_cuadricula(
+                    opciones_temp,
+                    iteraciones,
+                    poblacion,
+                    Generacion_Actual,
+                    color="Reds",
                 )
                 cantidades.append(resultado[1])
                 asesinados.append(resultado[2])
                 resultado_anterior = resultado_temp
                 resultado_temp = resultado
+
                 Generacion_Actual += 1
+
             else:
                 print("one o ninguno")
                 poblacion = cruzar_cromosomas(
@@ -447,14 +332,18 @@ def funcionamiento_principal(
                     probabilidad_asesino,
                     Probabilidad_mutacion,
                 )
-                resultado = plot_cuadricula_Mutados(
-                    poblacion, Generacion_Actual, color="Blues"
+                resultado = plot_cuadricula(
+                    opciones_temp,
+                    iteraciones,
+                    poblacion,
+                    Generacion_Actual,
+                    color="Blues",
                 )
                 cantidades.append(resultado[1])
                 asesinados.append(resultado[2])
                 resultado_anterior = resultado_anterior
                 resultado_temp = resultado
-                Generacion_Actual += 1
+
     if Cantidad_generaciones >= Generacion_Actual:
         print("limite sobrepasado")
 
@@ -569,18 +458,54 @@ def mutar_cromosomas(cromosoma, probabilidad_mutacion):
     return cromosoma
 
 
+def No_Negatividad(value):
+    ivalue = int(value)
+    if ivalue < 0:
+        raise argparse.ArgumentTypeError(f"{value} no puede ser negativo")
+    return ivalue
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Algoritmo genético")
     parser.add_argument(
-        "--generaciones", type=int, help="Cantidad de generaciones maximas"
+        "--generaciones",
+        type=No_Negatividad,
+        help="Cantidad de generaciones máximas",
+        required=True,
     )
-    parser.add_argument("--individuos", type=int, help="Cantidad Individuos")
-    parser.add_argument("--movimientos", type=int, help="Cantidad de movimientos")
-    parser.add_argument("--probabilidad", type=float, help="Probabilidad de asesino")
-    parser.add_argument("--mutacion", type=float, help="Probabilidad de mutacion")
+    parser.add_argument(
+        "--individuos",
+        type=No_Negatividad,
+        help="Cantidad de individuos",
+        required=True,
+    )
+    parser.add_argument(
+        "--movimientos",
+        type=No_Negatividad,
+        help="Cantidad de movimientos",
+        required=True,
+    )
+    parser.add_argument(
+        "--probabilidad", type=float, help="Probabilidad de asesino", required=True
+    )
+    parser.add_argument(
+        "--mutacion", type=float, help="Probabilidad de mutación", required=True
+    )
+    parser.add_argument(
+        "--iteraciones",
+        type=No_Negatividad,
+        help="Cantidad de iteraciones",
+        required=True,
+    )
+    parser.add_argument(
+        "--opciones",
+        type=str,
+        help="Opciones 'Si' o 'No'",
+        choices=["Si", "No"],
+        required=True,
+    )
 
     args = parser.parse_args()
-    print(args.probabilidad)
 
     funcionamiento_principal(
         args.generaciones,
@@ -588,6 +513,9 @@ if __name__ == "__main__":
         args.movimientos,
         args.probabilidad,
         args.mutacion,
+        args.iteraciones,
+        args.opciones,
+        Generacion_Actual=0,
     )
 
     # funcionamiento_principal(40, 20, 70)
