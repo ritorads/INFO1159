@@ -184,7 +184,7 @@ def plot_cuadricula(
 
             if nueva_columna != columnas - 1:
                 individuo["contador_movimientos"] -= 1
-    # if que imprime la matriz de la poblacion
+            # if que imprime la matriz de la poblacion
     if opciones == "Si":
         cuadricula = np.zeros((filas, columnas))
 
@@ -327,6 +327,7 @@ def funcionamiento_principal(
                     Cantidad_Individuos,
                     probabilidad_asesino,
                     Probabilidad_mutacion,
+                    cantidad_movimientos,
                 )
                 resultado = plot_cuadricula(
                     opciones_temp,
@@ -360,6 +361,7 @@ def funcionamiento_principal(
                     Cantidad_Individuos,
                     probabilidad_asesino,
                     Probabilidad_mutacion,
+                    cantidad_movimientos,
                 )
                 resultado = plot_cuadricula(
                     opciones_temp,
@@ -390,6 +392,7 @@ def funcionamiento_principal(
                     Cantidad_Individuos,
                     probabilidad_asesino,
                     Probabilidad_mutacion,
+                    cantidad_movimientos,
                 )
                 resultado = plot_cuadricula(
                     opciones_temp,
@@ -435,7 +438,7 @@ def funcionamiento_principal(
 
     # Gráfico de la cantidad de individuos que murieron
     print("-----------------------------------")
-    print(f" cantidad_asesinos : {asesinados} \n cantidad : {len(asesinados)}")
+    print(f" cantidad_asesinados : {asesinados} \n cantidad : {len(asesinados)}")
     ax3.plot(generaciones, asesinados)
     ax3.set_xlabel("Generación")
     ax3.set_ylabel("Cantidad de individuos muertos")
@@ -466,7 +469,11 @@ def funcionamiento_principal(
 
 
 def cruzar_cromosomas(
-    Mejores_individuos, cantidad_poblacion, probabilidad_asesino, probabilidad_mutacion
+    Mejores_individuos,
+    cantidad_poblacion,
+    probabilidad_asesino,
+    probabilidad_mutacion,
+    cantidad_movimientos,
 ):
     print("Cruce de cromosomas")
 
@@ -504,7 +511,7 @@ def cruzar_cromosomas(
             ID = "N"
         cromosomas_hijos = {
             "genes": gen_mutado_normalizado,
-            "contador_movimientos": 40,
+            "contador_movimientos": cantidad_movimientos,
             "posicion_actual": [0],
             "ID": ID,
         }
