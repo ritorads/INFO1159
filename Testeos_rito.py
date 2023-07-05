@@ -45,6 +45,11 @@ def creacion_cromosomas(num_genes, contador_movimientos, probabilidad_asesino):
     return cromosoma
 
 
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+
+
 def plot_cuadricula(
     opciones,
     iteraciones,
@@ -79,7 +84,6 @@ def plot_cuadricula(
     cuadricula = np.zeros((filas, columnas))
     condicion = 0
 
-    ##################################################
     for i, individuo in enumerate(poblacion):
         fila = i % filas
         columna = i // filas
@@ -87,17 +91,17 @@ def plot_cuadricula(
         cuadricula[fila][columna] = i + 1
         individuo["posiciones"] = [(fila, columna)]
 
-    # Opcion para ver la cuadricula
     if opciones == "Si":
         img = ax.matshow(cuadricula, cmap=color)
         plt.draw()
-        plt.pause(0.1)
+
     cantidad_finalistas = 0
     cantidad_asesinados = 0
+
     for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
         if opciones == "Si":
             ax.set_title(f"GENERACION {num_generaciones}, paso {paso + 1}")
-        # print(f"Paso {paso}:")
+
         for i, individuo in enumerate(poblacion):
             movimientos = [
                 "sur",
@@ -115,7 +119,7 @@ def plot_cuadricula(
             posicion_actual = individuo["posiciones"][-1]
 
             nueva_fila, nueva_columna = posicion_actual
-            # Condicionales para que no se salga de la cuadricula
+
             if nueva_columna == 0:
                 if movimiento == "oeste":
                     movimiento = "este"
@@ -168,14 +172,12 @@ def plot_cuadricula(
                     nueva_fila, nueva_columna = posicion_actual
             elif movimiento == "mantener":
                 nueva_fila, nueva_columna = posicion_actual
-            ################## CONDICIONAL DEL NORMAL ##################
+
             if cuadricula[nueva_fila][nueva_columna] != 0:
                 if individuo["ID"] == "N":
                     movimiento = "mantener"
                     nueva_fila, nueva_columna = posicion_actual
-                ################## CONDICIONAL DEL ASESINO ##################
                 elif individuo["ID"] == "A":
-                    # Eliminar el individuo de la población
                     if random.random() < Probabilidad_asesinar:
                         cantidad_asesinados += 1
                         poblacion = [ind for ind in poblacion if ind != individuo]
@@ -184,33 +186,33 @@ def plot_cuadricula(
 
             if nueva_columna != columnas - 1:
                 individuo["contador_movimientos"] -= 1
-            # if que imprime la matriz de la poblacion
+
+        if opciones == "Si":
+            cuadricula = np.zeros((filas, columnas))
+
+            for i, individuo in enumerate(poblacion):
+                fila, columna = individuo["posiciones"][-1]
+                cuadricula[fila][columna] = i + 1
+
+            img.set_data(cuadricula)
+            plt.draw()
+
     if opciones == "Si":
-        cuadricula = np.zeros((filas, columnas))
+        plt.show()
 
-        for i, individuo in enumerate(poblacion):
-            fila, columna = individuo["posiciones"][-1]
-            cuadricula[fila][columna] = i + 1
-
-        img.set_data(cuadricula)
-
-        plt.draw()
-        plt.pause(1)
-        plt.close()
-
-    # for que actualiza la posicion actual de los individuos
     for individuo in poblacion:
         individuo["posicion_actual"] = individuo["posiciones"][-1]
-    # for que cuenta la cantidad de finalistas
+
     for individuo in poblacion:
         if individuo["posicion_actual"][1] == tamano_tablero - 1:
             cantidad_finalistas += 1
-    # for para contar cuantos asesinos habia
+
     for individuo in poblacion:
         if individuo["ID"] == "A":
             cantidad_asesinos += 1
 
     seleccion = seleccion_padres(poblacion, pasos_maximos, tamano_tablero)
+
     print(f"cantidad de finalistas: {cantidad_finalistas}")
     return seleccion, cantidad_finalistas, cantidad_asesinados, cantidad_asesinos
 
