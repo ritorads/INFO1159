@@ -21,6 +21,7 @@ def crear_poblacion(num_individuos, contador_movimientos, probabilidad_asesino):
     return poblacion
 
 
+
 def creacion_cromosomas(num_genes, contador_movimientos, probabilidad_asesino):
     # Genera las probabilidades aleatorias
     probabilidades = [random.random() for _ in range(num_genes)]
