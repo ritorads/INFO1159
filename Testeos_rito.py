@@ -96,7 +96,7 @@ def plot_cuadricula(
     cantidad_asesinados = 0
     for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
         if opciones == "Si":
-            ax.set_title(f"GENERACION {num_generaciones}, paso {paso}")
+            ax.set_title(f"GENERACION {num_generaciones}, paso {paso + 1}")
         # print(f"Paso {paso}:")
         for i, individuo in enumerate(poblacion):
             movimientos = [
@@ -263,7 +263,6 @@ def seleccion_padres(poblacion, pasos_maximos, tamano_tablero):
             f"MEJORES INDIVIDUOS \n 1er lugar : {Mejores_individuos[0]['id']}, posicion{Mejores_individuos[0]['posicion_actual']}, contador pasos {Mejores_individuos[0]['contador_movimientos']} \
                 \n 2do lugar : {Mejores_individuos[1]['id']}, posicion{Mejores_individuos[1]['posicion_actual']}, contador pasos {Mejores_individuos[1]['contador_movimientos']}"
         )
-
         return Mejores_individuos
 
 
