@@ -76,6 +76,7 @@ def plot_cuadricula(
 
         plt.ion()
 
+
     cuadricula = np.zeros((filas, columnas))
     condicion = 0
 
