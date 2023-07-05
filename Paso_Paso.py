@@ -90,103 +90,117 @@ def plot_cuadricula(
     cantidad_finalistas = 0
     cantidad_asesinados = 0
     for paso in range(1, poblacion[0]["contador_movimientos"] + 1):
-        if opciones == "Si":
-            ax.set_title(f"GENERACION {num_generaciones}, paso {paso + 1}")
-            # print(f"Paso {paso}:")
-            for i, individuo in enumerate(poblacion):
-                movimientos = [
-                    "sur",
-                    "este",
-                    "oeste",
-                    "noreste",
-                    "noroeste",
-                    "sureste",
-                    "suroeste",
-                    "mantener",
-                ]
-                probabilidades = normalizar_vector(individuo["genes"])
-                movimiento = np.random.choice(movimientos, p=probabilidades)
+        # print(f"Paso {paso}:")
+        for i, individuo in enumerate(poblacion):
+            movimientos = [
+                "sur",
+                "este",
+                "oeste",
+                "noreste",
+                "noroeste",
+                "sureste",
+                "suroeste",
+                "mantener",
+            ]
+            probabilidades = normalizar_vector(individuo["genes"])
+            movimiento = np.random.choice(movimientos, p=probabilidades)
 
-                posicion_actual = individuo["posiciones"][-1]
+            posicion_actual = individuo["posiciones"][-1]
 
-                nueva_fila, nueva_columna = posicion_actual
-                # Condicionales para que no se salga de la cuadricula
-                if nueva_columna == 0:
-                    if movimiento == "oeste":
-                        movimiento = "este"
-                    elif movimiento == "noroeste":
-                        movimiento = "noreste"
-                    elif movimiento == "suroeste":
-                        movimiento = "sureste"
-
-                if nueva_columna == columnas - 1:
-                    movimiento = "mantener"
-
-                if movimiento == "sur":
-                    nueva_fila -= 1
-                    if nueva_fila < 0:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
-                elif movimiento == "este":
-                    nueva_columna += 1
-                    if nueva_columna >= columnas:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
-                elif movimiento == "oeste":
-                    nueva_columna -= 1
-                    if nueva_columna < 0:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
-                elif movimiento == "noreste":
-                    nueva_fila -= 1
-                    nueva_columna += 1
-                    if nueva_fila < 0 or nueva_columna >= columnas:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
+            nueva_fila, nueva_columna = posicion_actual
+            # Condicionales para que no se salga de la cuadricula
+            if nueva_columna == 0:
+                if movimiento == "oeste":
+                    movimiento = "este"
                 elif movimiento == "noroeste":
-                    nueva_fila -= 1
-                    nueva_columna -= 1
-                    if nueva_fila < 0 or nueva_columna < 0:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
-                elif movimiento == "sureste":
-                    nueva_fila += 1
-                    nueva_columna += 1
-                    if nueva_fila >= filas or nueva_columna >= columnas:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
+                    movimiento = "noreste"
                 elif movimiento == "suroeste":
-                    nueva_fila += 1
-                    nueva_columna -= 1
-                    if nueva_fila >= filas or nueva_columna < 0:
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
-                elif movimiento == "mantener":
+                    movimiento = "sureste"
+
+            if nueva_columna == columnas - 1:
+                movimiento = "mantener"
+
+            if movimiento == "sur":
+                nueva_fila -= 1
+                if nueva_fila < 0:
+                    movimiento = "mantener"
                     nueva_fila, nueva_columna = posicion_actual
-                ################## CONDICIONAL DEL NORMAL ##################
-                if cuadricula[nueva_fila][nueva_columna] != 0:
-                    if individuo["ID"] == "N":
-                        movimiento = "mantener"
-                        nueva_fila, nueva_columna = posicion_actual
-                    ################## CONDICIONAL DEL ASESINO ##################
-                    elif individuo["ID"] == "A":
-                        # Eliminar el individuo de la población
-                        if random.random() < Probabilidad_asesinar:
-                            cantidad_asesinados += 1
-                            poblacion = [ind for ind in poblacion if ind != individuo]
+            elif movimiento == "este":
+                nueva_columna += 1
+                if nueva_columna >= columnas:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "oeste":
+                nueva_columna -= 1
+                if nueva_columna < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "noreste":
+                nueva_fila -= 1
+                nueva_columna += 1
+                if nueva_fila < 0 or nueva_columna >= columnas:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "noroeste":
+                nueva_fila -= 1
+                nueva_columna -= 1
+                if nueva_fila < 0 or nueva_columna < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "sureste":
+                nueva_fila += 1
+                nueva_columna += 1
+                if nueva_fila >= filas or nueva_columna >= columnas:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "suroeste":
+                nueva_fila += 1
+                nueva_columna -= 1
+                if nueva_fila >= filas or nueva_columna < 0:
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+            elif movimiento == "mantener":
+                nueva_fila, nueva_columna = posicion_actual
+            ################## CONDICIONAL DEL NORMAL ##################
+            if cuadricula[nueva_fila][nueva_columna] != 0:
+                if individuo["ID"] == "N":
+                    movimiento = "mantener"
+                    nueva_fila, nueva_columna = posicion_actual
+                ################## CONDICIONAL DEL ASESINO ##################
+                elif individuo["ID"] == "A":
+                    # Eliminar el individuo de la población
+                    if random.random() < Probabilidad_asesinar:
+                        cantidad_asesinados += 1
+                        poblacion = [ind for ind in poblacion if ind != individuo]
 
-                individuo["posiciones"].append((nueva_fila, nueva_columna))
+            individuo["posiciones"].append((nueva_fila, nueva_columna))
 
-                if nueva_columna != columnas - 1:
-                    individuo["contador_movimientos"] -= 1
-            # if que imprime la matriz de la poblacion
+            if nueva_columna != columnas - 1:
+                individuo["contador_movimientos"] -= 1
+
+        # Plotting
+        if opciones == "Si":
+            fig.clear()
+            ax = fig.add_subplot(111)
+
+            ax.set_xticks(np.arange(columnas + 1) - 0.5, minor=True)
+            ax.set_yticks(np.arange(filas + 1) - 0.5, minor=True)
+            # Ajustar el tamaño de las celdas
+            ax.set_xlim([-0.5, columnas - 0.5])
+            ax.set_ylim([-0.5, filas - 0.5])
+            ax.set_xlabel("DIRECION HACIA LA META -->")
+            ax.set_ylabel("INICIO DE INDIVIDUOS")
+            ax.set_aspect("equal")
+            ax.grid(which="minor", color="black", linestyle="-", linewidth=1)
+
             cuadricula = np.zeros((filas, columnas))
-
             for i, individuo in enumerate(poblacion):
                 fila, columna = individuo["posiciones"][-1]
                 cuadricula[fila][columna] = i + 1
 
             img = ax.matshow(cuadricula, cmap=color)
+
+            ax.set_title(f"GENERACION {num_generaciones}, paso {paso}")
 
             plt.draw()
             plt.pause(0.01)
